@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>LithoLog Pro V20 - Edición Geológica Avanzada</title>
+    
+    <meta name="application-name" content="LithoLog Pro">
+    <meta name="apple-mobile-web-app-title" content="LithoLog">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23eab308' stroke-width='8'%3E%3Crect x='10' y='10' width='80' height='80' rx='10' fill='%230f172a' stroke='none'/%3E%3Cpath d='M20 40 L80 40 M20 60 L80 60 M20 80 L80 80' stroke='%23fbbf24' stroke-width='6'/%3E%3Cpath d='M20 30 Q 50 20 80 30' stroke='%23fbbf24' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; overscroll-behavior-y: none; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; border: 2px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .touch-action-none { touch-action: none; }
+        input[type="color"] { -webkit-appearance: none; border: none; padding: 0; cursor: pointer; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 1px solid #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col overflow-hidden text-gray-800">
+
+    <header class="bg-slate-900 text-white p-2.5 shadow-md flex justify-between items-center z-20 shrink-0 safe-area-top">
+        <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+            <div>
+                <h1 class="text-base sm:text-lg font-bold leading-none tracking-tight flex items-center gap-1.5">
+                    LithoLog Pro 
+                    <span class="text-amber-400 font-semibold text-[10px] border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 rounded">V20.0 Senior</span>
+                </h1>
+            </div>
+        </div>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <button onclick="undoAction()" id="btn-undo" title="Deshacer último cambio (Ctrl+Z)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-amber-400 rounded text-xs font-bold flex items-center gap-1 border border-slate-700 transition-all">
+                <i data-lucide="undo-2" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Deshacer</span>
+            </button>
+            <div class="bg-slate-800 rounded p-1 flex border border-slate-700">
+                <button onclick="setViewMode('profile')" id="btn-view-profile" class="px-2.5 py-1 text-xs font-bold rounded flex gap-1 items-center bg-amber-500 text-slate-950 transition-all"><i data-lucide="bar-chart-horizontal" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Perfil</span></button>
+                <button onclick="setViewMode('legend')" id="btn-view-legend" class="px-2.5 py-1 text-xs font-bold rounded flex gap-1 items-center text-gray-400 hover:text-white transition-all"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">Leyenda</span></button>
+            </div>
+            <div class="hidden sm:flex gap-1.5 ml-1">
+                <button onclick="exportToPNG()" title="Descargar imagen PNG" class="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 px-2.5 py-1.5 rounded text-xs font-bold text-white shadow-sm transition-colors"><i data-lucide="image" class="w-3.5 h-3.5"></i> PNG</button>
+                <button onclick="exportToSVG()" title="Descargar vector SVG editable (Illustrator/Corel/Inkscape)" class="flex items-center gap-1 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 px-2.5 py-1.5 rounded text-xs font-bold text-white shadow-sm transition-colors"><i data-lucide="pen-tool" class="w-3.5 h-3.5"></i> SVG</button>
+                <button onclick="exportProjectJSON()" title="Guardar archivo de proyecto (.json)" class="flex items-center gap-1 bg-slate-700 hover:bg-slate-600 px-2.5 py-1.5 rounded text-xs font-bold text-gray-200 shadow-sm transition-colors"><i data-lucide="save" class="w-3.5 h-3.5"></i> JSON</button>
+            </div>
+            <button onclick="toggleHelpModal()" class="text-gray-400 hover:text-amber-400 p-1.5 rounded transition-colors" title="Ayuda"><i data-lucide="help-circle" class="w-5 h-5"></i></button>
+            <button onclick="exportToPNG()" class="sm:hidden flex items-center bg-emerald-600 active:bg-emerald-700 p-1.5 rounded text-white shadow-sm"><i data-lucide="download" class="w-4 h-4"></i></button>
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-300 p-1.5 active:bg-slate-800 rounded transition-all"><i data-lucide="sliders-horizontal" class="w-5 h-5"></i></button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        <main class="flex-1 overflow-auto bg-slate-300 p-2 md:p-6 relative touch-pan-x touch-pan-y">
+            <div id="svg-container" class="bg-white shadow-2xl transition-all duration-200 relative mx-auto origin-top-left border border-gray-400"></div>
+            <div class="h-20 md:hidden"></div>
+        </main>
+        
+        <aside id="sidebar" class="absolute inset-y-0 right-0 w-96 max-w-full bg-white border-l border-gray-300 shadow-2xl flex flex-col z-30 transition-transform duration-300 transform translate-x-full md:translate-x-0 md:relative md:flex">
+            <div class="md:hidden flex justify-between items-center p-3 bg-slate-100 border-b shadow-sm">
+                <span class="font-bold text-gray-700 flex items-center gap-2 text-sm"><i data-lucide="layers" class="w-4 h-4 text-blue-600"></i> Panel de Control Estratigráfico</span>
+                <button onclick="toggleSidebar()" class="p-1 bg-white border rounded text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                <button onclick="setActiveTab('layers')" id="tab-layers" class="flex-1 py-2.5 text-[11px] font-bold uppercase tracking-wider text-blue-600 border-b-2 border-blue-600 bg-white hover:bg-slate-50 flex items-center justify-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Estratos</button>
+                <button onclick="setActiveTab('colors')" id="tab-colors" class="flex-1 py-2.5 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b-2 border-transparent hover:bg-gray-100 flex items-center justify-center gap-1.5"><i data-lucide="palette" class="w-3.5 h-3.5"></i> Paleta</button>
+                <button onclick="setActiveTab('project')" id="tab-project" class="flex-1 py-2.5 text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b-2 border-transparent hover:bg-gray-100 flex items-center justify-center gap-1.5"><i data-lucide="folder-cog" class="w-3.5 h-3.5"></i> Proyecto</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-3.5 bg-slate-50 space-y-3" id="sidebar-content"></div>
+        </aside>
+    </div>
+    
+    <!-- MODAL AYUDA -->
+    <div id="help-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex justify-center items-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative border border-gray-200">
+            <button onclick="toggleHelpModal()" class="absolute top-3 right-3 text-gray-400 hover:text-black"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="compass" class="text-amber-500 w-5 h-5"></i> Guía Rápida LithoLog Pro</h3>
+            <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4">
+                <li><strong>Color y Grano por Sub-nivel:</strong> Dentro de cada estrato puedes combinar hasta 3 litologías, cada una con su color, escala granulométrica y estructura interna propia.</li>
+                <li><strong>Gradación Curva Suave:</strong> Une suavemente los granos de los sub-niveles o genera tendencias granodecrecientes/granocrecientes sin puntas artificiales.</li>
+                <li><strong>Etiquetas Editables en Referencias:</strong> En la pestaña <em>Paleta</em> o haciendo clic en la vista <em>Leyenda</em> puedes personalizar los nombres (ej. <em>"Arenisca rojiza"</em>).</li>
+                <li><strong>Exportación Limpia:</strong> Los botones PNG y SVG exportan el perfil limpio ocultando automáticamente las guías de selección.</li>
+            </ul>
+            <button onclick="toggleHelpModal()" class="w-full mt-5 bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-lg font-bold text-xs transition-colors">Entendido</button>
+        </div>
+    </div>
+
+    <input type="file" id="json-file-input" accept=".json" class="hidden" onchange="importProjectJSON(event)" />
+    <canvas id="export-canvas" style="display:none;"></canvas>
+
+    <script>
+        // --- ESCALAS GRANULOMÉTRICAS (Udden-Wentworth / Dunham / Piroclásticas) ---
+        const GRAIN_SCALES = {
+            'clastic': [
+                { id: 'clay', label: 'Arcilla', abbr: 'Arc', width: 30 },
+                { id: 'silt', label: 'Limo', abbr: 'Lmo', width: 60 },
+                { id: 'vf_sand', label: 'A. Muy Fina', abbr: 'Amf', width: 90 },
+                { id: 'f_sand', label: 'A. Fina', abbr: 'Af', width: 120 },
+                { id: 'm_sand', label: 'A. Media', abbr: 'Am', width: 150 },
+                { id: 'c_sand', label: 'A. Gruesa', abbr: 'Ag', width: 180 },
+                { id: 'vc_sand', label: 'A. Muy G.', abbr: 'Amg', width: 210 },
+                { id: 'gravel', label: 'Grava/Cgl', abbr: 'Gva', width: 250 },
+            ],
+            'carbonate': [
+                { id: 'mudstone', label: 'Mudstone', abbr: 'M', width: 45 },
+                { id: 'wackestone', label: 'Wackestone', abbr: 'W', width: 90 },
+                { id: 'packstone', label: 'Packstone', abbr: 'P', width: 135 },
+                { id: 'grainstone', label: 'Grainstone', abbr: 'G', width: 180 },
+                { id: 'boundstone', label: 'Boundstone', abbr: 'B', width: 220 },
+                { id: 'crystalline', label: 'Cristalina', abbr: 'Cr', width: 250 },
+            ],
+            'pyroclastic': [
+                { id: 'fine_ash', label: 'Ceniza Fina', abbr: 'Cf', width: 50 },
+                { id: 'coarse_ash', label: 'Ceniza Gruesa', abbr: 'Cg', width: 100 },
+                { id: 'lapilli', label: 'Lapilli', abbr: 'Lap', width: 170 },
+                { id: 'blocks', label: 'Bloques/Bombas', abbr: 'Blq', width: 250 }
+            ],
+            'fixed': [
+                { id: 'aphanitic', label: 'Afanítica / Masiva', abbr: 'Af/M', width: 130 },
+                { id: 'porphyritic', label: 'Porfírica', abbr: 'Porf', width: 190 },
+                { id: 'phaneritic', label: 'Fanerítica / Dura', abbr: 'Fan/R', width: 250 }
+            ]
+        };
+
+        function getGrainWidth(grainId, fallbackCategory = 'clastic') {
+            for (const cat in GRAIN_SCALES) {
+                const found = GRAIN_SCALES[cat].find(g => g.id === grainId);
+                if (found) return found.width;
+            }
+            const scale = GRAIN_SCALES[fallbackCategory] || GRAIN_SCALES.fixed;
+            return scale[0]?.width || 120;
+        }
+
+        function getAllGrainOptionsForCategory(category) {
+            if (GRAIN_SCALES[category]) return GRAIN_SCALES[category];
+            return GRAIN_SCALES.fixed;
+        }
+
+        const ROCK_CATEGORIES = [
+            { id: 'clastic', label: 'Sedimentaria Clástica' },
+            { id: 'carbonate', label: 'Carbonática (Dunham)' },
+            { id: 'pyroclastic', label: 'Piroclástica' },
+            { id: 'volcanic', label: 'Volcánica / Subvolcánica' },
+            { id: 'plutonic', label: 'Plutónica / Cristalina' },
+            { id: 'other', label: 'Química / Orgánica / Otras' }
+        ];
+
+        const DEFAULT_LITHOLOGIES = [
+            { id: 'mudstone', label: 'Fangolita / Arcillita', abbr: 'Mdst', pattern: 'pat-mud', color: '#D1D5DB', category: 'clastic', defaultGrain: 'clay' },
+            { id: 'shale', label: 'Lutita Laminada / Pelita', abbr: 'Sh', pattern: 'pat-shale', color: '#9CA3AF', category: 'clastic', defaultGrain: 'clay' },
+            { id: 'heterolithic', label: 'Heterolítica (Flaser/Wavy)', abbr: 'Het', pattern: 'pat-hetero', color: '#E5E7EB', category: 'clastic', defaultGrain: 'silt' },
+            { id: 'siltstone', label: 'Limolita', abbr: 'Slt', pattern: 'pat-silt', color: '#FEF3C7', category: 'clastic', defaultGrain: 'silt' },
+            { id: 'sandstone', label: 'Arenisca', abbr: 'Sst', pattern: 'pat-sand', color: '#FDE047', category: 'clastic', defaultGrain: 'f_sand' },
+            { id: 'pebbly_sand', label: 'Arenisca Conglom.', abbr: 'PSst', pattern: 'pat-pebbly', color: '#FACC15', category: 'clastic', defaultGrain: 'vc_sand' },
+            { id: 'conglomerate', label: 'Conglomerado', abbr: 'Cgl', pattern: 'pat-cong', color: '#FDBA74', category: 'clastic', defaultGrain: 'gravel' },
+            { id: 'breccia', label: 'Brecha Sedimentaria', abbr: 'Brc', pattern: 'pat-breccia', color: '#FB923C', category: 'clastic', defaultGrain: 'gravel' },
+            { id: 'limestone', label: 'Caliza', abbr: 'Lst', pattern: 'pat-lime', color: '#93C5FD', category: 'carbonate', defaultGrain: 'wackestone' },
+            { id: 'oelime', label: 'Caliza Oolítica / Biocl.', abbr: 'Ool', pattern: 'pat-oolite', color: '#60A5FA', category: 'carbonate', defaultGrain: 'grainstone' },
+            { id: 'dolomite', label: 'Dolomía', abbr: 'Dol', pattern: 'pat-dolo', color: '#38BDF8', category: 'carbonate', defaultGrain: 'packstone' },
+            { id: 'marl', label: 'Marga / Caliza Margosa', abbr: 'Mrl', pattern: 'pat-marl', color: '#BFDBFE', category: 'carbonate', defaultGrain: 'mudstone' },
+            { id: 'tuff', label: 'Toba / Chonita', abbr: 'Tuf', pattern: 'pat-tuff', color: '#FEF08A', category: 'pyroclastic', defaultGrain: 'fine_ash' },
+            { id: 'tuffite', label: 'Tufita (Reworked)', abbr: 'Tft', pattern: 'pat-tuffite', color: '#FDE68A', category: 'pyroclastic', defaultGrain: 'coarse_ash' },
+            { id: 'lapilli', label: 'Lapillita / Ignimbrita', abbr: 'Lap', pattern: 'pat-lapilli', color: '#FCD34D', category: 'pyroclastic', defaultGrain: 'lapilli' },
+            { id: 'agglomerate', label: 'Aglomerado Volcánico', abbr: 'Agl', pattern: 'pat-breccia', color: '#F59E0B', category: 'pyroclastic', defaultGrain: 'blocks' },
+            { id: 'plutonic', label: 'Granitoide', abbr: 'Grn', pattern: 'pat-plut', color: '#FCA5A5', category: 'plutonic', defaultGrain: 'phaneritic' },
+            { id: 'gabbro', label: 'Gabro / Diorita', abbr: 'Gb', pattern: 'pat-plut', color: '#F87171', category: 'plutonic', defaultGrain: 'phaneritic' },
+            { id: 'volcanic', label: 'Riolita / Andesita', abbr: 'Volc', pattern: 'pat-volc', color: '#FB7185', category: 'volcanic', defaultGrain: 'porphyritic' },
+            { id: 'basalt', label: 'Basalto / Colada', abbr: 'Bas', pattern: 'pat-volc', color: '#475569', category: 'volcanic', defaultGrain: 'aphanitic' },
+            { id: 'coal', label: 'Carbón / Nivel Carbonoso', abbr: 'Coal', pattern: 'pat-coal', color: '#1F2937', category: 'other', defaultGrain: 'aphanitic' },
+            { id: 'evaporite', label: 'Yeso / Anhidrita / Halita', abbr: 'Evap', pattern: 'pat-evap', color: '#E9D5FF', category: 'other', defaultGrain: 'crystalline' },
+            { id: 'chert', label: 'Chert / Ftanita / Sílex', abbr: 'Chrt', pattern: 'pat-chert', color: '#A7F3D0', category: 'other', defaultGrain: 'aphanitic' },
+            { id: 'covered', label: 'Cubierto / Sin Aflor.', abbr: 'Cub', pattern: 'pat-covered', color: '#F3F4F6', category: 'other', defaultGrain: 'clay' },
+        ];
+
+        const GEO_COLOR_PRESETS = [
+            { name: 'Lutita Negra (Vaca Muerta)', hex: '#374151' },
+            { name: 'Gris Fangolita', hex: '#9CA3AF' },
+            { name: 'Gris Claro', hex: '#D1D5DB' },
+            { name: 'Verde Glauconítico', hex: '#86EFAC' },
+            { name: 'Rojo Continental (Capas Rojas)', hex: '#FCA5A5' },
+            { name: 'Terracota / Rojizo', hex: '#FDBA74' },
+            { name: 'Amarillo Arenisca', hex: '#FDE047' },
+            { name: 'Ocre Limolita', hex: '#FEF08A' },
+            { name: 'Naranja Conglomerado', hex: '#FB923C' },
+            { name: 'Azul Caliza', hex: '#93C5FD' },
+            { name: 'Celeste Dolomía', hex: '#7DD3FC' },
+            { name: 'Violeta Evaporita', hex: '#E9D5FF' }
+        ];
+
+        const STRUCTURES = [
+            { id: 'none', label: 'Masiva / Sin estructura', abbr: '', iconPath: '' },
+            { id: 'parallel', label: 'Laminación Paralela', abbr: '', pattern: 'str-parallel', iconPath: 'M2,8 L18,8 M2,13 L18,13' },
+            { id: 'planar_cross', label: 'Estratificación Cruzada Planar', abbr: '', pattern: 'str-planar', iconPath: 'M18,3 L2,17 M11,3 L2,11 M18,10 L10,17' },
+            { id: 'trough_cross', label: 'Estratificación Cruzada en Artesa', abbr: '', pattern: 'str-trough', iconPath: 'M2,8 Q10,17 18,8 M4,4 Q10,11 16,4' },
+            { id: 'low_angle', label: 'Estratificación Cruzada Bajo Ángulo', abbr: '', pattern: 'str-low_angle', iconPath: 'M2,15 L18,10 M2,10 L18,5' },
+            { id: 'wavy', label: 'Laminación Ondulosa', abbr: '', pattern: 'str-wavy', iconPath: 'M2,10 Q6,5 10,10 T18,10' },
+            { id: 'sigmoidal', label: 'Estratificación Cruzada Sigmoidal', abbr: '', pattern: 'str-sigmoidal', iconPath: 'M4,17 C14,17 6,3 16,3' },
+            { id: 'convolute', label: 'Laminación Convoluta', abbr: '', pattern: 'str-convolute', iconPath: 'M2,10 Q6,1 10,10 T18,10' },
+            { id: 'hummocky', label: 'Estratificación Hummocky', abbr: '', pattern: 'str-hummocky', iconPath: 'M2,12 Q10,6 18,12 M5,16 Q10,12 15,16' },
+            { id: 'ripple', label: 'Óndulas de Corriente / Ripples', abbr: '', pattern: 'str-ripple', iconPath: 'M2,12 Q6,6 10,12 T18,12' },
+            { id: 'climbing', label: 'Ripples Escalonados', abbr: '', pattern: 'str-ripple', iconPath: 'M2,16 L18,6 M2,12 Q6,6 10,12 T18,12' },
+            { id: 'bioturbation', label: 'Bioturbación', abbr: '', pattern: 'str-bio', iconPath: 'M5,5 Q10,15 15,5 M3,15 Q8,6 17,15' },
+            { id: 'mudcracks', label: 'Grietas de Desecación', abbr: '', pattern: 'str-mudcracks', iconPath: 'M4,4 L10,17 L16,4' },
+            { id: 'intraclasts', label: 'Intraclastos Pelíticos', abbr: '', pattern: 'str-intraclasts', iconPath: 'M4,14 L8,17 L6,10 Z M12,6 L16,8 L14,12 Z' },
+            { id: 'flutes', label: 'Calcos de Flujo', abbr: '', pattern: 'str-flutes', iconPath: 'M10,16 Q14,5 16,16 M4,16 Q8,8 10,16' },
+            { id: 'load_casts', label: 'Calcos de Carga', abbr: '', pattern: 'str-load_casts', iconPath: 'M3,5 Q10,19 17,5' },
+            { id: 'roots', label: 'Rizolitos / Raíces', abbr: '', pattern: 'str-roots', iconPath: 'M10,2 L10,10 M10,10 L6,17 M10,10 L14,16' },
+            { id: 'fossils', label: 'Fósiles / Bioclastos', abbr: '', pattern: 'str-fossils', iconPath: 'M6,10 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 M10,6 L10,14' },
+            { id: 'ammonites', label: 'Amonites / Cefalópodos', abbr: '', pattern: 'str-fossils', iconPath: 'M10,10 m-6,0 a6,6 0 1,0 12,0 a4,4 0 1,0 -8,0' },
+            { id: 'nodules', label: 'Nódulos / Concreciones', abbr: '', pattern: 'str-nodules', iconPath: 'M6,8 a3,2 0 1,0 6,0 a3,2 0 1,0 -6,0 M12,14 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0' },
+        ];
+
+        const CONTACTS = [
+            { id: 'sharp', label: 'Neto / Plano' },
+            { id: 'erosional', label: 'Erosivo / Discordante' },
+            { id: 'gradational', label: 'Gradacional / Transicional' },
+            { id: 'dashed', label: 'Inferido / Cubierto' },
+        ];
+
+        const GRADING_TYPES = [
+            { id: 'uniform', label: 'Escalones Suaves (Borde Natural Redondeado)' },
+            { id: 'smooth', label: 'Transición Curva Continua (Une Sub-niveles)' },
+            { id: 'normal', label: 'Granodecreciente Suave (Normal ▲)' },
+            { id: 'inverse', label: 'Granocreciente Suave (Inversa ▼)' }
+        ];
+
+        const SVG_DEFS = `
+          <defs>
+            <pattern id="pat-mud" width="20" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="6" x2="14" y2="6" stroke="#374151" stroke-width="1" opacity="0.65"/><line x1="6" y1="16" x2="20" y2="16" stroke="#374151" stroke-width="1" opacity="0.65"/></pattern>
+            <pattern id="pat-shale" width="20" height="6" patternUnits="userSpaceOnUse"><line x1="0" y1="3" x2="16" y2="3" stroke="#1F2937" stroke-width="1" opacity="0.7"/></pattern>
+            <pattern id="pat-silt" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="0.7" fill="#78350F" opacity="0.7"/><circle cx="9" cy="9" r="0.7" fill="#78350F" opacity="0.7"/><line x1="0" y1="6" x2="12" y2="6" stroke="#92400E" stroke-width="0.6" stroke-dasharray="3 2" opacity="0.7"/></pattern>
+            <pattern id="pat-sand" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="0.9" fill="#422006" opacity="0.65"/><circle cx="7" cy="7" r="0.9" fill="#422006" opacity="0.65"/><circle cx="8" cy="2" r="0.6" fill="#422006" opacity="0.5"/></pattern>
+            <pattern id="pat-pebbly" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.9" fill="#422006" opacity="0.6"/><circle cx="14" cy="10" r="0.9" fill="#422006" opacity="0.6"/><circle cx="9" cy="14" r="2.5" stroke="#422006" fill="none" stroke-width="1" opacity="0.7"/></pattern>
+            <pattern id="pat-cong" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="3.5" stroke="#000" fill="none" stroke-width="1.1" opacity="0.65"/><circle cx="16" cy="16" r="4.2" stroke="#000" fill="none" stroke-width="1.1" opacity="0.65"/><circle cx="16" cy="5" r="1.5" stroke="#000" fill="none" opacity="0.5"/></pattern>
+            <pattern id="pat-breccia" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M2,10 L8,3 L14,10 Z M12,19 L16,12 L20,18 Z" stroke="#000" fill="none" stroke-width="1" opacity="0.65"/></pattern>
+            <pattern id="pat-lime" width="30" height="15" patternUnits="userSpaceOnUse"><path d="M0,7.5 L30,7.5 M15,0 L15,7.5 M0,7.5 L0,15 M30,7.5 L30,15" stroke="#1E3A8A" stroke-width="1" opacity="0.6"/></pattern>
+            <pattern id="pat-oolite" width="24" height="16" patternUnits="userSpaceOnUse"><path d="M0,8 L24,8 M12,0 L12,8" stroke="#1E3A8A" stroke-width="0.8" opacity="0.5"/><circle cx="6" cy="4" r="1.8" stroke="#1E3A8A" fill="none" stroke-width="0.8"/><circle cx="18" cy="12" r="1.8" stroke="#1E3A8A" fill="none" stroke-width="0.8"/></pattern>
+            <pattern id="pat-dolo" width="24" height="14" patternUnits="userSpaceOnUse"><path d="M0,7 L24,7 M12,0 L9,7 M21,7 L18,14" stroke="#1E3A8A" stroke-width="1" opacity="0.6"/></pattern>
+            <pattern id="pat-marl" width="30" height="15" patternUnits="userSpaceOnUse"><path d="M0,7.5 L12,7.5 M18,7.5 L30,7.5 M15,0 L15,4 M15,11 L15,15" stroke="#1E3A8A" stroke-width="1" opacity="0.6"/></pattern>
+            <pattern id="pat-plut" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M5,2 L5,8 M2,5 L8,5 M15,12 L15,18 M12,15 L18,15" stroke="#881337" stroke-width="1.2" opacity="0.7"/></pattern>
+            <pattern id="pat-tuff" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M4,14 L7,8 L10,14 M12,6 L15,12 L18,6" stroke="#713F12" fill="none" stroke-width="1" opacity="0.7"/></pattern>
+            <pattern id="pat-tuffite" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M3,12 L6,7 L9,12" stroke="#713F12" fill="none" stroke-width="1"/><line x1="0" y1="16" x2="20" y2="16" stroke="#713F12" stroke-width="0.7" stroke-dasharray="4 2"/></pattern>
+            <pattern id="pat-lapilli" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M4,10 L8,4 L12,10 Z" stroke="#713F12" fill="none" stroke-width="1"/><circle cx="16" cy="16" r="2.5" stroke="#713F12" fill="none"/></pattern>
+            <pattern id="pat-volc" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M3,5 L8,11 L13,5" stroke="#0f172a" fill="none" stroke-width="1.1" opacity="0.65"/></pattern>
+            <pattern id="pat-coal" width="10" height="10" patternUnits="userSpaceOnUse"><line x1="0" y1="5" x2="10" y2="5" stroke="#000" stroke-width="2" opacity="0.4"/></pattern> 
+            <pattern id="pat-evap" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M5,10 L15,10 M10,5 L10,15" stroke="#581C87" stroke-width="1" /><path d="M2,2 L8,8 M18,2 L12,8" stroke="#581C87" stroke-width="1" /></pattern>
+            <pattern id="pat-chert" width="20" height="14" patternUnits="userSpaceOnUse"><path d="M2,7 Q10,1 18,7 Q10,13 2,7 Z" stroke="#065F46" fill="none" stroke-width="1" opacity="0.6"/></pattern>
+            <pattern id="pat-covered" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="12" stroke="#6B7280" stroke-width="2" /></pattern>
+            <pattern id="pat-hetero" width="24" height="12" patternUnits="userSpaceOnUse"><path d="M0,3 Q6,0 12,3 T24,3 M0,9 L24,9" stroke="#374151" stroke-width="1" fill="none" opacity="0.7"/></pattern>
+
+            <pattern id="str-parallel" width="100" height="10" patternUnits="userSpaceOnUse"><line x1="0" y1="5" x2="100" y2="5" stroke="#000" stroke-width="1" opacity="0.75"/></pattern>
+            <pattern id="str-planar" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20,0 L0,20 M0,0 L20,0" stroke="#000" stroke-width="1" opacity="0.75"/></pattern>
+            <pattern id="str-trough" width="40" height="20" patternUnits="userSpaceOnUse"><path d="M0,5 Q20,25 40,5" stroke="#000" stroke-width="1" fill="none" opacity="0.75"/></pattern>
+            <pattern id="str-hummocky" width="60" height="20" patternUnits="userSpaceOnUse"><path d="M0,15 Q30,5 60,15" stroke="#000" stroke-width="1" fill="none" opacity="0.8"/><path d="M10,20 Q40,10 70,20" stroke="#000" stroke-width="1" fill="none" opacity="0.8"/></pattern>
+            <pattern id="str-ripple" width="20" height="10" patternUnits="userSpaceOnUse"><path d="M0,8 Q5,2 10,8 T20,8" stroke="#000" stroke-width="1" fill="none" opacity="0.75"/></pattern>
+            <pattern id="str-bio" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M5,5 Q10,20 15,5 T25,15" stroke="#000" stroke-width="1" fill="none" /><path d="M20,30 Q30,20 35,35" stroke="#000" stroke-width="1" fill="none" /></pattern>
+            <pattern id="str-roots" width="30" height="40" patternUnits="userSpaceOnUse"><path d="M15,0 L15,20 M15,20 L10,35 M15,20 L20,30" stroke="#000" stroke-width="1" fill="none" /></pattern>
+            <pattern id="str-fossils" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M10,15 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 M 15,10 L 15,20" stroke="#000" stroke-width="1" fill="none"/></pattern>
+            <pattern id="str-nodules" width="50" height="50" patternUnits="userSpaceOnUse"><ellipse cx="15" cy="15" rx="5" ry="3" stroke="#000" fill="none" /><ellipse cx="35" cy="35" rx="6" ry="4" stroke="#000" fill="none" /></pattern>
+            <pattern id="str-convolute" width="40" height="20" patternUnits="userSpaceOnUse"><path d="M0,10 C10,0 10,20 20,10 C30,0 30,20 40,10" stroke="#000" stroke-width="1" fill="none" opacity="0.8"/></pattern>
+            <pattern id="str-mudcracks" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M2,2 L10,18 L18,2" stroke="#000" stroke-width="1.5" fill="none" /></pattern>
+            <pattern id="str-intraclasts" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M5,20 L15,25 L10,15 Z M20,5 L28,8 L25,15 Z" stroke="#000" fill="none" stroke-width="1"/></pattern>
+            <pattern id="str-flutes" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M10,18 Q14,5 18,18 M2,18 Q5,5 8,18" stroke="#000" stroke-width="1" fill="none"/></pattern>
+            <pattern id="str-wavy" width="30" height="15" patternUnits="userSpaceOnUse"><path d="M0,7 Q7,2 15,7 T30,7 M0,12 Q7,7 15,12 T30,12" stroke="#000" stroke-width="1" fill="none" /></pattern>
+            <pattern id="str-low_angle" width="40" height="20" patternUnits="userSpaceOnUse"><path d="M0,10 L40,5 M0,20 L40,15" stroke="#000" stroke-width="1" /></pattern>
+            <pattern id="str-sigmoidal" width="40" height="30" patternUnits="userSpaceOnUse"><path d="M5,25 C15,25 25,5 35,5" stroke="#000" stroke-width="1" fill="none"/></pattern>
+            <pattern id="str-load_casts" width="30" height="15" patternUnits="userSpaceOnUse"><path d="M5,0 Q15,15 25,0" stroke="#000" stroke-width="1" fill="none"/></pattern>
+          </defs>
+        `;
+
+        // Estado por defecto
+        const defaultState = {
+            projectInfo: {
+                formation: 'Fm. Vaca Muerta - Quintuco',
+                location: 'Cuenca Neuquina - Perfil 1',
+                date: new Date().toISOString().split('T')[0],
+                geologist: 'Geólogo Senior',
+                scale: '100',
+                notes: 'Transición de rampa externa anóxica a barras submareales.'
+            },
+            customLithoColors: {},
+            customLegendLabels: {},
+            userQuickColors: ['#1E293B', '#065F46', '#9A3412', '#B45309', '#4338CA', '#BE185D'],
+            activeSubLevelForColor: 0,
+            beds: [
+                {
+                    id: 101,
+                    thickness: 3.5,
+                    category: 'clastic',
+                    grainSize: 'clay',
+                    grading: 'uniform',
+                    contact: 'sharp',
+                    description: 'Lutita negra bituminosa finamente laminada con nódulos carbonáticos aislados.',
+                    lithologies: ['shale'],
+                    lithoColors: ['#374151'],
+                    lithoGrains: ['clay'],
+                    lithoStructures: ['parallel'],
+                    structureMain: 'parallel',
+                    structuresSec: ['nodules'],
+                    age: 'Tithoniano',
+                    ageColor: '#E0F2FE',
+                    group: 'Mendoza',
+                    groupColor: '#F1F5F9',
+                    formation: 'Vaca Muerta',
+                    formationColor: '#FEF9C3'
+                },
+                {
+                    id: 102,
+                    thickness: 4.5,
+                    category: 'clastic',
+                    grainSize: 'f_sand',
+                    grading: 'smooth',
+                    contact: 'erosional',
+                    description: 'Secuencia heterolítica granocreciente: fangolita gris en base pasando a arenisca fina con estratificación en artesa.',
+                    lithologies: ['sandstone', 'heterolithic', 'mudstone'],
+                    lithoColors: ['#FDE047', '#CBD5E1', '#9CA3AF'],
+                    lithoGrains: ['f_sand', 'silt', 'clay'],
+                    lithoStructures: ['trough_cross', 'wavy', 'parallel'],
+                    structureMain: 'none',
+                    structuresSec: ['bioturbation'],
+                    age: 'Berriasiano',
+                    ageColor: '#DCFCE7',
+                    group: 'Mendoza',
+                    groupColor: '#F1F5F9',
+                    formation: 'Quintuco',
+                    formationColor: '#FFEDD5'
+                }
+            ],
+            pixelsPerMeter: 40,
+            selectedBedId: 102,
+            sidebarOpen: window.innerWidth > 768,
+            activeTab: 'layers',
+            viewMode: 'profile'
+        };
+
+        let state = JSON.parse(JSON.stringify(defaultState));
+        let historyStack = [];
+
+        function pushHistory() {
+            const snap = JSON.stringify({
+                projectInfo: state.projectInfo,
+                customLithoColors: state.customLithoColors,
+                customLegendLabels: state.customLegendLabels,
+                userQuickColors: state.userQuickColors,
+                beds: state.beds,
+                selectedBedId: state.selectedBedId
+            });
+            if (historyStack.length === 0 || historyStack[historyStack.length - 1] !== snap) {
+                historyStack.push(snap);
+                if (historyStack.length > 35) historyStack.shift();
+            }
+            updateUndoButton();
+        }
+
+        function undoAction() {
+            if (historyStack.length <= 1) return;
+            historyStack.pop();
+            const prevSnap = JSON.parse(historyStack[historyStack.length - 1]);
+            state.projectInfo = prevSnap.projectInfo;
+            state.customLithoColors = prevSnap.customLithoColors;
+            state.customLegendLabels = prevSnap.customLegendLabels || {};
+            state.userQuickColors = prevSnap.userQuickColors;
+            state.beds = prevSnap.beds;
+            state.selectedBedId = prevSnap.selectedBedId;
+            saveLocal();
+            renderApp();
+            updateUndoButton();
+        }
+
+        function updateUndoButton() {
+            const btn = document.getElementById('btn-undo');
+            if (btn) btn.disabled = historyStack.length <= 1;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undoAction();
+            }
+        });
+
+        function getBaseLithoColor(lithoId) {
+            if (state.customLithoColors && state.customLithoColors[lithoId]) {
+                return state.customLithoColors[lithoId];
+            }
+            const found = DEFAULT_LITHOLOGIES.find(l => l.id === lithoId);
+            return found ? found.color : '#E5E7EB';
+        }
+
+        function normalizeStateBeds() {
+            if (!state.customLithoColors) state.customLithoColors = {};
+            if (!state.customLegendLabels) state.customLegendLabels = {};
+            if (!state.userQuickColors || state.userQuickColors.length === 0) {
+                state.userQuickColors = ['#1E293B', '#065F46', '#9A3412', '#B45309', '#4338CA', '#BE185D'];
+            }
+            if (typeof state.activeSubLevelForColor !== 'number') state.activeSubLevelForColor = 0;
+
+            state.beds.forEach(bed => {
+                if (!bed.lithologies || bed.lithologies.length === 0) bed.lithologies = ['mudstone'];
+                if (!bed.lithoColors) bed.lithoColors = [];
+                if (!bed.lithoGrains) bed.lithoGrains = [];
+                if (!bed.lithoStructures) bed.lithoStructures = [];
+                if (!bed.grading) bed.grading = 'uniform';
+                if (!bed.ageColor) bed.ageColor = '#FFFFFF';
+                if (!bed.groupColor) bed.groupColor = '#FFFFFF';
+                if (!bed.formationColor) bed.formationColor = '#FFFFFF';
+
+                bed.lithologies.forEach((lid, idx) => {
+                    if (!bed.lithoColors[idx]) bed.lithoColors[idx] = getBaseLithoColor(lid);
+                    if (!bed.lithoGrains[idx]) {
+                        bed.lithoGrains[idx] = bed.grainSize || DEFAULT_LITHOLOGIES.find(l => l.id === lid)?.defaultGrain || 'f_sand';
+                    }
+                    if (!bed.lithoStructures[idx]) {
+                        bed.lithoStructures[idx] = (idx === 0 && bed.structureMain && bed.structureMain !== 'none') ? bed.structureMain : 'none';
+                    }
+                });
+                bed.lithoColors = bed.lithoColors.slice(0, bed.lithologies.length);
+                bed.lithoGrains = bed.lithoGrains.slice(0, bed.lithologies.length);
+                bed.lithoStructures = bed.lithoStructures.slice(0, bed.lithologies.length);
+            });
+        }
+
+        function saveLocal() {
+            localStorage.setItem('litholog_data_v20', JSON.stringify(state));
+        }
+
+        function loadLocal() {
+            const data = localStorage.getItem('litholog_data_v20') || localStorage.getItem('litholog_data_v19');
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    state = { ...defaultState, ...parsed };
+                    normalizeStateBeds();
+                } catch (e) { console.error("Error cargando datos", e); }
+            } else {
+                normalizeStateBeds();
+            }
+            pushHistory();
+        }
+
+        function resetProject() {
+            state = JSON.parse(JSON.stringify(defaultState));
+            state.beds[0].id = Date.now();
+            state.beds[1].id = Date.now() + 1;
+            state.selectedBedId = state.beds[1].id;
+            normalizeStateBeds();
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function getStratigraphicBlocks(beds, field, colorField) {
+            const blocks = [];
+            if (beds.length === 0) return blocks;
+            let currentBlock = {
+                value: beds[0][field],
+                color: beds[0][colorField] || '#FFFFFF',
+                startIndex: 0,
+                endIndex: 0
+            };
+            for (let i = 1; i < beds.length; i++) {
+                const val = beds[i][field];
+                const col = beds[i][colorField] || '#FFFFFF';
+                if (val === currentBlock.value && col === currentBlock.color) {
+                    currentBlock.endIndex = i;
+                } else {
+                    blocks.push(currentBlock);
+                    currentBlock = { value: val, color: col, startIndex: i, endIndex: i };
+                }
+            }
+            blocks.push(currentBlock);
+            return blocks;
+        }
+
+        function getBlockYCoordinates(beds, startIndex, endIndex, pixelsPerMeter, totalHeight) {
+            let hBefore = 0;
+            for (let i = 0; i < startIndex; i++) hBefore += Number(beds[i].thickness);
+            let hBlock = 0;
+            for (let i = startIndex; i <= endIndex; i++) hBlock += Number(beds[i].thickness);
+            const yBottom = totalHeight - (hBefore * pixelsPerMeter);
+            const yTop = yBottom - (hBlock * pixelsPerMeter);
+            return { yTop, yBottom };
+        }
+
+        function getErosionalStroke(width, y) {
+            const waves = Math.max(4, Math.round(width / 25));
+            const waveW = width / waves;
+            let d = `M ${width} ${y}`;
+            for (let i = 1; i <= waves; i++) {
+                d += ` Q ${width - (i * waveW) + (waveW / 2)} ${y + 5} ${width - (i * waveW)} ${y}`;
+            }
+            return d;
+        }
+
+        // Genera los anchos superior e inferior de cada sub-nivel con transiciones curvas suaves
+        function computeSliceWidths(bed) {
+            const n = Math.max(1, bed.lithologies.length);
+            const rawWidths = bed.lithologies.map((_, idx) => {
+                const gId = (bed.lithoGrains && bed.lithoGrains[idx]) ? bed.lithoGrains[idx] : bed.grainSize;
+                return getGrainWidth(gId, bed.category);
+            });
+
+            const mode = bed.grading || 'uniform';
+
+            if (mode === 'smooth') {
+                return rawWidths.map((w, idx) => {
+                    const wTop = idx === 0 ? w : (rawWidths[idx - 1] + w) / 2;
+                    const wBot = idx === n - 1 ? w : (w + rawWidths[idx + 1]) / 2;
+                    return { wTop, wBot, isSmoothCurve: true };
+                });
+            }
+
+            if (mode === 'normal') {
+                const maxW = Math.max(...rawWidths);
+                const minW = n > 1 ? Math.min(...rawWidths) : Math.max(30, maxW - 35);
+                return rawWidths.map((_, idx) => {
+                    const tTop = idx / n;
+                    const tBot = (idx + 1) / n;
+                    return {
+                        wTop: minW + (maxW - minW) * tTop,
+                        wBot: minW + (maxW - minW) * tBot,
+                        isSmoothCurve: true
+                    };
+                });
+            }
+
+            if (mode === 'inverse') {
+                const maxW = Math.max(...rawWidths);
+                const minW = n > 1 ? Math.min(...rawWidths) : Math.max(30, maxW - 35);
+                return rawWidths.map((_, idx) => {
+                    const tTop = idx / n;
+                    const tBot = (idx + 1) / n;
+                    return {
+                        wTop: maxW - (maxW - minW) * tTop,
+                        wBot: maxW - (maxW - minW) * tBot,
+                        isSmoothCurve: true
+                    };
+                });
+            }
+
+            // Modo 'uniform': Escalones suaves con bordes redondeados naturales
+            return rawWidths.map(w => ({ wTop: w, wBot: w, isSmoothCurve: false }));
+        }
+
+        // Construye el contorno completo derecho del estrato con curvas Bézier suaves
+        function buildRightEdgePath(slices, yTop, hPx, index) {
+            const n = slices.length;
+            const sliceH = hPx / n;
+            let d = '';
+
+            slices.forEach((sl, idx) => {
+                const sTop = yTop + idx * sliceH;
+                const sBot = sTop + sliceH;
+                const sMid = (sTop + sBot) / 2;
+
+                if (idx === 0) {
+                    d += `M ${sl.wTop} ${sTop}`;
+                } else {
+                    const prevW = slices[idx - 1].wBot;
+                    if (Math.abs(prevW - sl.wTop) > 0.5) {
+                        const stepH = Math.min(6, sliceH * 0.25);
+                        d += ` C ${prevW} ${sTop + stepH * 0.5}, ${sl.wTop} ${sTop + stepH * 0.5}, ${sl.wTop} ${sTop + stepH}`;
+                    }
+                }
+
+                if (sl.isSmoothCurve) {
+                    const ctrlY1 = sTop + sliceH * 0.45;
+                    const ctrlY2 = sTop + sliceH * 0.55;
+                    d += ` C ${sl.wTop} ${ctrlY1}, ${sl.wBot} ${ctrlY2}, ${sl.wBot} ${sBot}`;
+                } else {
+                    const bulge = ((index + idx) % 2 === 0 ? 2.5 : -1.5);
+                    d += ` Q ${sl.wTop + bulge} ${sMid} ${sl.wBot} ${sBot}`;
+                }
+            });
+
+            return d;
+        }
+
+        function getBedOutlinePath(slices, yTop, yBottom, index, beds) {
+            const topW = slices[0].wTop;
+            const botW = slices[slices.length - 1].wBot;
+            let d = '';
+            const nextBed = beds[index + 1];
+
+            if (nextBed && nextBed.contact === 'erosional') {
+                const waves = Math.max(4, Math.round(topW / 25));
+                const waveW = topW / waves;
+                d += `M 0 ${yTop}`;
+                for (let k = 0; k < waves; k++) {
+                    d += ` Q ${(k * waveW) + (waveW / 2)} ${yTop + 5} ${(k + 1) * waveW} ${yTop}`;
+                }
+                d += ` L ${topW} ${yTop}`;
+            } else {
+                d += `M 0 ${yTop} L ${topW} ${yTop}`;
+            }
+
+            const rightSeg = buildRightEdgePath(slices, yTop, yBottom - yTop, index).replace(/^M [^ ]+ [^ ]+/, '');
+            d += rightSeg;
+
+            if (beds[index].contact === 'erosional' && index !== 0) {
+                const waves = Math.max(4, Math.round(botW / 25));
+                const waveW = botW / waves;
+                for (let k = 1; k <= waves; k++) {
+                    d += ` Q ${botW - (k * waveW) + (waveW / 2)} ${yBottom + 5} ${botW - (k * waveW)} ${yBottom}`;
+                }
+            } else {
+                d += ` L 0 ${yBottom}`;
+            }
+            d += ` L 0 ${yTop} Z`;
+            return d;
+        }
+
+        function wrapSvgText(text, maxChars) {
+            if (!text) return [''];
+            const words = text.split(' ');
+            let lines = [];
+            let currentLine = words[0];
+            for (let i = 1; i < words.length; i++) {
+                if (currentLine.length + 1 + words[i].length <= maxChars) {
+                    currentLine += " " + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        function toggleHelpModal() { document.getElementById('help-modal').classList.toggle('hidden'); }
+        function renderApp() {
+            renderSVG();
+            renderSidebar();
+            updateUndoButton();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderSVG() {
+            const container = document.getElementById('svg-container');
+            const totalThickness = state.beds.reduce((acc, b) => acc + Number(b.thickness), 0);
+            const columnHeight = Math.max(40, totalThickness * state.pixelsPerMeter);
+            const svgWidth = 900;
+            const bedsStartY = 190;
+            const footerY = bedsStartY + columnHeight + 35;
+
+            const headerSVG = `
+                <g transform="translate(0,0)">
+                    <rect x="0" y="0" width="900" height="100" fill="none" stroke="black" stroke-width="2"/>
+                    <line x1="620" y1="0" x2="620" y2="100" stroke="black" stroke-width="1"/>
+                    <text x="20" y="34" font-size="22" font-family="serif" font-weight="bold">PERFIL ESTRATIGRÁFICO</text>
+                    <g transform="translate(20,58)" font-size="12" font-family="sans-serif">
+                        <text x="0" y="0" font-weight="bold">Aflor/Fm:</text><text x="65" y="0">${state.projectInfo.formation}</text>
+                        <text x="0" y="22" font-weight="bold">Ubicación:</text><text x="65" y="22">${state.projectInfo.location}</text>
+                        <text x="330" y="0" font-weight="bold">Fecha:</text><text x="375" y="0">${state.projectInfo.date}</text>
+                        <text x="330" y="22" font-weight="bold">Geólogo:</text><text x="385" y="22">${state.projectInfo.geologist}</text>
+                    </g>
+                    <g transform="translate(640,22)">
+                        <text x="0" y="14" font-size="10" font-weight="bold" fill="#4b5563">ESCALA GRÁFICA</text>
+                        <text x="0" y="45" font-size="26" font-weight="bold">1:${state.projectInfo.scale}</text>
+                        <text x="145" y="45" font-size="11" fill="#374151">Espesor: ${totalThickness.toFixed(1)} m</text>
+                    </g>
+                </g>`;
+
+            const grainScaleClastic = GRAIN_SCALES.clastic.map((g, i) => {
+                const prevW = i === 0 ? 0 : GRAIN_SCALES.clastic[i - 1].width;
+                const center = (prevW + g.width) / 2;
+                return `<line x1="${g.width}" y1="-20" x2="${g.width}" y2="0" stroke="#9ca3af" stroke-width="0.8"/><text x="${center}" y="-6" text-anchor="middle" font-size="8" font-weight="bold" fill="#000">${g.abbr}</text>`;
+            }).join('');
+
+            const grainScaleCarb = GRAIN_SCALES.carbonate.map((g, i) => {
+                const prevW = i === 0 ? 0 : GRAIN_SCALES.carbonate[i - 1].width;
+                const center = (prevW + g.width) / 2;
+                return `<line x1="${g.width}" y1="-38" x2="${g.width}" y2="-20" stroke="#93c5fd" stroke-width="0.8"/><text x="${center}" y="-25" text-anchor="middle" font-size="8" font-weight="bold" fill="#1e3a8a">${g.abbr}</text>`;
+            }).join('');
+
+            const colHeadersSVG = `
+                <g transform="translate(0,130)">
+                    <rect x="0" y="0" width="60" height="60" fill="#e5e7eb" stroke="black"/><text x="30" y="34" text-anchor="middle" font-size="10" font-weight="bold">EDAD</text>
+                    <rect x="60" y="0" width="50" height="60" fill="#e5e7eb" stroke="black"/><text x="85" y="34" text-anchor="middle" font-size="10" font-weight="bold">GRUPO</text>
+                    <rect x="110" y="0" width="70" height="60" fill="#e5e7eb" stroke="black"/><text x="145" y="34" text-anchor="middle" font-size="10" font-weight="bold">FM.</text>
+                    <rect x="180" y="0" width="40" height="60" fill="#e5e7eb" stroke="black"/><text x="200" y="34" text-anchor="middle" font-size="10" font-weight="bold">m</text>
+                    <rect x="220" y="0" width="260" height="60" fill="#e5e7eb" stroke="black"/>
+                    <text x="350" y="15" text-anchor="middle" font-size="10" font-weight="bold">LITOLOGÍA / GRANO</text>
+                    <line x1="220" y1="22" x2="480" y2="22" stroke="#cbd5e1" stroke-width="1"/>
+                    <line x1="220" y1="40" x2="480" y2="40" stroke="#9ca3af" stroke-width="1"/>
+                    <g transform="translate(220, 60)">${grainScaleClastic}${grainScaleCarb}</g>
+                    <rect x="480" y="0" width="80" height="60" fill="#e5e7eb" stroke="black"/><text x="520" y="34" text-anchor="middle" font-size="10" font-weight="bold">EST.</text>
+                    <rect x="560" y="0" width="340" height="60" fill="#e5e7eb" stroke="black"/><text x="730" y="34" font-size="10" font-weight="bold" text-anchor="middle">DESCRIPCIÓN LITOLÓGICA Y FACIES</text>
+                </g>`;
+
+            let stratSVG = '';
+            const fieldConfigs = [
+                { field: 'age', colorField: 'ageColor', xOffset: 0, width: 60, maxChars: 15, fontSize: 13 },
+                { field: 'group', colorField: 'groupColor', xOffset: 60, width: 50, maxChars: 14, fontSize: 12 },
+                { field: 'formation', colorField: 'formationColor', xOffset: 110, width: 70, maxChars: 18, fontSize: 11 }
+            ];
+
+            fieldConfigs.forEach(cfg => {
+                const blocks = getStratigraphicBlocks(state.beds, cfg.field, cfg.colorField);
+                blocks.forEach(b => {
+                    const { yTop, yBottom } = getBlockYCoordinates(state.beds, b.startIndex, b.endIndex, state.pixelsPerMeter, columnHeight);
+                    const h = yBottom - yTop;
+                    const value = b.value || '';
+                    const lines = wrapSvgText(value, cfg.maxChars);
+                    const lineHeight = cfg.fontSize + 3;
+
+                    let linesMarkup = lines.map((line, i) => {
+                        const lineYOffset = (i - (lines.length - 1) / 2) * lineHeight;
+                        return `<text x="${cfg.width / 2}" y="${h / 2 + lineYOffset}" text-anchor="middle" alignment-baseline="middle" font-size="${cfg.fontSize}" font-weight="bold" fill="#111827" transform="rotate(-90 ${cfg.width / 2} ${h / 2})">${line}</text>`;
+                    }).join('');
+
+                    stratSVG += `<g transform="translate(${cfg.xOffset}, ${yTop})">
+                        <rect x="0" y="0" width="${cfg.width}" height="${h}" fill="${b.color}" stroke="black" stroke-width="1"/>
+                        ${linesMarkup}
+                    </g>`;
+                });
+            });
+
+            let currentY = columnHeight;
+            let bedsSVG = '';
+            let clipsDefs = '';
+
+            state.beds.forEach((bed, index) => {
+                const hPx = Number(bed.thickness) * state.pixelsPerMeter;
+                const yTop = currentY - hPx;
+                const yBottom = currentY;
+
+                const slices = computeSliceWidths(bed);
+                const topW = slices[0].wTop;
+                const botW = slices[slices.length - 1].wBot;
+
+                const clipId = `clip-${bed.id}`;
+                const outlinePath = getBedOutlinePath(slices, yTop, yBottom, index, state.beds);
+                clipsDefs += `<clipPath id="${clipId}"><path d="${outlinePath}"/></clipPath>`;
+
+                const numSlices = slices.length;
+                const sliceHeight = hPx / numSlices;
+                let layersRender = '';
+
+                bed.lithologies.forEach((lid, idx) => {
+                    const l = DEFAULT_LITHOLOGIES.find(x => x.id === lid);
+                    if (!l) return;
+                    const sliceColor = (bed.lithoColors && bed.lithoColors[idx]) ? bed.lithoColors[idx] : getBaseLithoColor(lid);
+                    const sliceStructId = (bed.lithoStructures && bed.lithoStructures[idx]) ? bed.lithoStructures[idx] : 'none';
+                    const sTop = yTop + (idx * sliceHeight);
+
+                    layersRender += `<rect x="0" y="${sTop}" width="265" height="${sliceHeight + 0.8}" fill="${sliceColor}" stroke="none" />`;
+                    if (l.pattern) {
+                        layersRender += `<rect x="0" y="${sTop}" width="265" height="${sliceHeight + 0.8}" fill="url(#${l.pattern})" stroke="none" />`;
+                    }
+                    if (sliceStructId && sliceStructId !== 'none') {
+                        const sObj = STRUCTURES.find(x => x.id === sliceStructId);
+                        if (sObj && sObj.pattern) {
+                            layersRender += `<rect x="0" y="${sTop}" width="265" height="${sliceHeight + 0.8}" fill="url(#${sObj.pattern})" fill-opacity="0.7" stroke="none" style="pointer-events:none" />`;
+                        }
+                    }
+                    if (idx > 0 && bed.grading === 'uniform') {
+                        layersRender += `<line x1="0" y1="${sTop}" x2="265" y2="${sTop}" stroke="#000" stroke-width="0.6" stroke-dasharray="3 2" opacity="0.5"/>`;
+                    }
+                });
+
+                if (bed.structureMain && bed.structureMain !== 'none') {
+                    const s = STRUCTURES.find(x => x.id === bed.structureMain);
+                    if (s && s.pattern) {
+                        layersRender += `<rect x="0" y="${yTop}" width="265" height="${hPx}" fill="url(#${s.pattern})" fill-opacity="0.65" stroke="none" style="pointer-events:none" />`;
+                    }
+                }
+
+                let contactPath = `M ${botW} ${yBottom} L 0 ${yBottom}`;
+                let contactStyle = 'stroke="black" stroke-width="1.5" fill="none"';
+                if (index !== 0) {
+                    if (bed.contact === 'erosional') contactPath = getErosionalStroke(botW, yBottom);
+                    else if (bed.contact === 'gradational') contactStyle = 'stroke="black" stroke-width="0.7" stroke-dasharray="2,2" fill="none"';
+                    else if (bed.contact === 'dashed') contactStyle = 'stroke="black" stroke-width="1.5" stroke-dasharray="5,3" fill="none"';
+                }
+
+                const rightEdgePath = buildRightEdgePath(slices, yTop, hPx, index);
+                const topEdgePath = (index === state.beds.length - 1) ? `M 0 ${yTop} L ${topW} ${yTop}` : '';
+                const isSelected = bed.id === state.selectedBedId;
+                const selectionOverlay = isSelected
+                    ? `<g class="selection-ui"><rect x="-4" y="${yTop}" width="4" height="${hPx}" fill="#2563eb" /><rect x="341" y="${yTop + 1}" width="338" height="${Math.max(0, hPx - 2)}" fill="#eff6ff" opacity="0.6"/></g>`
+                    : '';
+
+                let secIcons = '';
+                if (bed.structuresSec && bed.structuresSec.length > 0) {
+                    const startX = 260 + (80 - (bed.structuresSec.length * 22)) / 2;
+                    bed.structuresSec.forEach((sid, i) => {
+                        const s = STRUCTURES.find(x => x.id === sid);
+                        if (s?.iconPath) {
+                            secIcons += `<g transform="translate(${startX + (i * 22)}, ${yTop + hPx / 2 - 10})"><path d="${s.iconPath}" stroke="black" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>`;
+                        }
+                    });
+                }
+
+                const maxDescLines = Math.max(1, Math.floor((hPx - 8) / 14));
+                const descLines = wrapSvgText(bed.description, 46).slice(0, Math.max(2, maxDescLines));
+                const descSVG = descLines.map((line, i) => `<text x="0" y="${i * 14}" font-size="11" font-family="Arial, sans-serif" fill="#1f2937">${line}</text>`).join('');
+
+                bedsSVG += `
+                    <g onclick="selectBed(${bed.id})" class="cursor-pointer hover:opacity-95">
+                       ${selectionOverlay}
+                       <g clip-path="url(#${clipId})">${layersRender}</g>
+                       <path d="M 0 ${yBottom} L 0 ${yTop}" stroke="black" stroke-width="1.5" fill="none" />
+                       <path d="${rightEdgePath}" stroke="black" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" fill="none" />
+                       <path d="${topEdgePath}" stroke="black" stroke-width="1.5" fill="none" />
+                       <path d="${contactPath}" ${contactStyle} />
+                       <line x1="260" y1="${yTop}" x2="260" y2="${yBottom}" stroke="#9ca3af" stroke-width="1" />
+                       <line x1="340" y1="${yTop}" x2="340" y2="${yBottom}" stroke="#9ca3af" stroke-width="1" />
+                       ${secIcons}
+                       <line x1="340" y1="${yTop}" x2="680" y2="${yTop}" stroke="#d1d5db" stroke-width="1" />
+                       <line x1="680" y1="${yTop}" x2="680" y2="${yBottom}" stroke="black" stroke-width="2" />
+                       <g transform="translate(350, ${yTop + 15})">${descSVG}</g>
+                    </g>
+                `;
+                currentY -= hPx;
+            });
+
+            let yTicks = `<g transform="translate(220, ${bedsStartY})"><line x1="0" y1="0" x2="0" y2="${columnHeight}" stroke="black" stroke-width="1.5" />`;
+            for (let i = 0; i <= Math.ceil(totalThickness); i++) {
+                const y = columnHeight - (i * state.pixelsPerMeter);
+                if (y >= -1) {
+                    yTicks += `<g><line x1="-6" y1="${y}" x2="0" y2="${y}" stroke="black" stroke-width="1.2" /><text x="-9" y="${y}" text-anchor="end" alignment-baseline="middle" font-size="10" font-weight="bold">${i}</text></g>`;
+                }
+            }
+            yTicks += `</g>`;
+
+            const grainGridSVG = GRAIN_SCALES.clastic.map(g => `<line x1="${g.width}" y1="0" x2="${g.width}" y2="${columnHeight}" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4 3"/>`).join('');
+
+            const notesLines = wrapSvgText(state.projectInfo.notes || 'Sin observaciones adicionales.', 125);
+            const notesSvgText = notesLines.map((line, i) => `<text x="0" y="${32 + (i * 13)}" font-size="10.5" font-family="Arial, sans-serif" fill="#374151">${line}</text>`).join('');
+            const notesSVG = `<g transform="translate(0, ${footerY})"><line x1="0" y1="0" x2="900" y2="0" stroke="black" stroke-width="1.5"/><text x="0" y="18" font-size="11" font-weight="bold">OBSERVACIONES / INTERPRETACIÓN DE FACIES:</text>${notesSvgText}</g>`;
+
+            container.style.width = svgWidth + 'px';
+
+            if (state.viewMode === 'profile') {
+                container.style.height = (footerY + 110) + 'px';
+                container.innerHTML = `<svg width="${svgWidth}" height="${footerY + 110}" xmlns="http://www.w3.org/2000/svg" class="bg-white block"><defs>${clipsDefs}</defs>${SVG_DEFS}<g transform="translate(25, 20)">${headerSVG}${colHeadersSVG}<g transform="translate(0, ${bedsStartY})">${stratSVG}</g>${yTicks}<g transform="translate(220, ${bedsStartY})">${grainGridSVG}${bedsSVG}<line x1="0" y1="${columnHeight}" x2="680" y2="${columnHeight}" stroke="black" stroke-width="1.5"/></g>${notesSVG}</g></svg>`;
+            } else {
+                const usedLithoPairs = [];
+                state.beds.forEach(b => {
+                    b.lithologies.forEach((lid, idx) => {
+                        const col = (b.lithoColors && b.lithoColors[idx]) ? b.lithoColors[idx] : getBaseLithoColor(lid);
+                        const key = `${lid}_${col}`;
+                        if (!usedLithoPairs.find(x => x.key === key)) {
+                            const lObj = DEFAULT_LITHOLOGIES.find(x => x.id === lid);
+                            if (lObj) {
+                                const displayLabel = (state.customLegendLabels && state.customLegendLabels[key]) ? state.customLegendLabels[key] : lObj.label;
+                                usedLithoPairs.push({ key, litho: lObj, color: col, label: displayLabel });
+                            }
+                        }
+                    });
+                });
+
+                const usedStructs = new Set(state.beds.flatMap(b => [b.structureMain, ...(b.lithoStructures || []), ...(b.structuresSec || [])]).filter(s => s && s !== 'none'));
+                const usedContacts = new Set(state.beds.map(b => b.contact));
+                const filteredStructs = STRUCTURES.filter(s => usedStructs.has(s.id)).map(s => {
+                    const key = `struct_${s.id}`;
+                    return { ...s, key, displayLabel: (state.customLegendLabels && state.customLegendLabels[key]) ? state.customLegendLabels[key] : s.label };
+                });
+                const filteredContacts = CONTACTS.filter(c => usedContacts.has(c.id)).map(c => {
+                    const key = `contact_${c.id}`;
+                    return { ...c, key, displayLabel: (state.customLegendLabels && state.customLegendLabels[key]) ? state.customLegendLabels[key] : c.label };
+                });
+
+                let lithoLegendSVG = usedLithoPairs.map((item, i) => {
+                    const x = (i % 3) * 270;
+                    const y = Math.floor(i / 3) * 60;
+                    const safeKey = item.key.replace(/'/g, "\\'");
+                    const safeLabel = item.label.replace(/'/g, "\\'");
+                    return `<g transform="translate(${x}, ${y})" onclick="editLegendLabel('${safeKey}', '${safeLabel}')" class="cursor-pointer group">
+                        <rect x="0" y="0" width="45" height="38" stroke="#000" stroke-width="1" fill="${item.color}" />
+                        <rect x="0" y="0" width="45" height="38" stroke="none" fill="url(#${item.litho.pattern})" />
+                        <text x="56" y="23" font-size="12" font-weight="bold" fill="#0f172a">${item.label}</text>
+                        <text x="56" y="36" font-size="9" fill="#3b82f6" class="selection-ui">✎ Clic para editar etiqueta</text>
+                    </g>`;
+                }).join('');
+
+                const lithoRows = Math.ceil(usedLithoPairs.length / 3) || 1;
+                const structStartY = 110 + (lithoRows * 60) + 40;
+                let structLegendSVG = filteredStructs.map((s, i) => {
+                    const x = (i % 2) * 400;
+                    const y = Math.floor(i / 2) * 58;
+                    const safeKey = s.key.replace(/'/g, "\\'");
+                    const safeLabel = s.displayLabel.replace(/'/g, "\\'");
+                    return `<g transform="translate(${x},${y})" onclick="editLegendLabel('${safeKey}', '${safeLabel}')" class="cursor-pointer">
+                        <rect x="0" y="0" width="42" height="36" stroke="#000" stroke-width="1" fill="white"/>
+                        ${s.pattern ? `<rect x="0" y="0" width="42" height="36" fill="url(#${s.pattern})" fill-opacity="0.85"/>` : ''}
+                        <rect x="48" y="0" width="36" height="36" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="2,2" fill="#f8fafc" rx="3"/>
+                        ${s.iconPath ? `<g transform="translate(56,8)"><path d="${s.iconPath}" stroke="#000000" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round" fill="none"/></g>` : ''}
+                        <text x="96" y="21" font-size="12" font-weight="bold" fill="#0f172a">${s.displayLabel}</text>
+                        <text x="96" y="34" font-size="9" fill="#3b82f6" class="selection-ui">✎ Editar</text>
+                     </g>`;
+                }).join('');
+                const structHeight = (Math.ceil(filteredStructs.length / 2) || 1) * 58;
+
+                const contactStartY = structStartY + structHeight + 40;
+                let contactsLegendSVG = filteredContacts.map((c, i) => {
+                    const x = i * 210;
+                    const safeKey = c.key.replace(/'/g, "\\'");
+                    const safeLabel = c.displayLabel.replace(/'/g, "\\'");
+                    let line = c.id === 'erosional' ? '<path d="M0,20 Q10,30 20,20 Q30,10 40,20" stroke="black" stroke-width="1.5" fill="none"/>' :
+                               c.id === 'dashed' ? '<line x1="0" y1="20" x2="40" y2="20" stroke="black" stroke-width="1.5" stroke-dasharray="5,3"/>' :
+                               c.id === 'gradational' ? '<line x1="0" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.7" stroke-dasharray="2,2"/>' : '<line x1="0" y1="20" x2="40" y2="20" stroke="black" stroke-width="1.5"/>';
+                    return `<g transform="translate(${x},0)" onclick="editLegendLabel('${safeKey}', '${safeLabel}')" class="cursor-pointer">${line}<text x="50" y="24" font-size="12" font-weight="bold">${c.displayLabel}</text><text x="50" y="36" font-size="9" fill="#3b82f6" class="selection-ui">✎ Editar</text></g>`;
+                }).join('');
+
+                const totalLegendHeight = contactStartY + 120;
+                container.style.height = totalLegendHeight + 'px';
+                container.innerHTML = `<svg width="${svgWidth}" height="${totalLegendHeight}" xmlns="http://www.w3.org/2000/svg" class="bg-white block">${SVG_DEFS}<g transform="translate(25, 20)"><text x="450" y="40" text-anchor="middle" font-size="22" font-family="serif" font-weight="bold">REFERENCIAS ESTRATIGRÁFICAS</text><line x1="50" y1="52" x2="850" y2="52" stroke="black" stroke-width="2"/><text x="50" y="90" font-size="14" font-weight="bold" fill="#1e293b">LITOLOGÍAS Y COLORES REGISTRADOS</text><g transform="translate(50, 110)">${lithoLegendSVG || '<text y="20" fill="gray">Ninguna</text>'}</g><line x1="50" y1="${structStartY - 20}" x2="850" y2="${structStartY - 20}" stroke="#cbd5e1"/><text x="50" y="${structStartY}" font-size="14" font-weight="bold" fill="#1e293b">ESTRUCTURAS SEDIMENTARIAS Y CONTENIDO FÓSIL</text><g transform="translate(50, ${structStartY + 20})">${structLegendSVG || '<text y="20" fill="gray">Ninguna</text>'}</g><line x1="50" y1="${contactStartY - 20}" x2="850" y2="${contactStartY - 20}" stroke="#cbd5e1"/><text x="50" y="${contactStartY}" font-size="14" font-weight="bold" fill="#1e293b">CONTACTOS ENTRE ESTRATOS</text><g transform="translate(50, ${contactStartY + 20})">${contactsLegendSVG || '<text y="20" fill="gray">Ninguno</text>'}</g></g></svg>`;
+            }
+        }
+
+        function renderSidebar() {
+            const content = document.getElementById('sidebar-content');
+            let html = '';
+
+            if (state.activeTab === 'layers') {
+                const bedListPills = state.beds.slice().reverse().map((b) => {
+                    const realIdx = state.beds.findIndex(x => x.id === b.id);
+                    const mainLitho = DEFAULT_LITHOLOGIES.find(l => l.id === b.lithologies[0]);
+                    const c0 = (b.lithoColors && b.lithoColors[0]) ? b.lithoColors[0] : '#ddd';
+                    const activeCls = b.id === state.selectedBedId ? 'ring-2 ring-blue-600 bg-blue-50 border-blue-400' : 'bg-white border-gray-200 hover:bg-gray-100';
+                    return `<button onclick="selectBed(${b.id})" class="flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] font-medium shrink-0 transition-all ${activeCls}">
+                        <span class="w-3 h-3 rounded-sm border border-gray-400" style="background:${c0}"></span>
+                        <span>#${realIdx + 1} ${mainLitho ? mainLitho.abbr : ''} (${b.thickness}m)</span>
+                    </button>`;
+                }).join('');
+
+                html = `
+                    <div class="flex gap-1.5">
+                        <button onclick="addBed()" class="flex-1 py-2.5 bg-slate-900 text-white rounded-lg font-bold text-xs flex justify-center items-center gap-1.5 hover:bg-slate-800 shadow transition-colors">
+                            <i data-lucide="plus-circle" class="w-4 h-4 text-amber-400"></i> Agregar Estrato
+                        </button>
+                    </div>
+                    <div class="flex gap-1 overflow-x-auto pb-1 pt-0.5">${bedListPills}</div>
+                `;
+
+                const bed = state.beds.find(b => b.id === state.selectedBedId);
+                if (bed) {
+                    const idx = state.beds.findIndex(b => b.id === state.selectedBedId);
+                    const catOptions = ROCK_CATEGORIES.map(c => `<option value="${c.id}" ${bed.category === c.id ? 'selected' : ''}>${c.label}</option>`).join('');
+                    const gradingOptions = GRADING_TYPES.map(g => `<option value="${g.id}" ${bed.grading === g.id ? 'selected' : ''}>${g.label}</option>`).join('');
+
+                    const uniqueAges = [...new Set(state.beds.map(b => b.age).filter(Boolean))];
+                    const uniqueGroups = [...new Set(state.beds.map(b => b.group).filter(Boolean))];
+                    const uniqueFms = [...new Set(state.beds.map(b => b.formation).filter(Boolean))];
+                    const datalistsHTML = `
+                        <datalist id="dl-ages">${uniqueAges.map(v => `<option value="${v}">`).join('')}</datalist>
+                        <datalist id="dl-groups">${uniqueGroups.map(v => `<option value="${v}">`).join('')}</datalist>
+                        <datalist id="dl-fms">${uniqueFms.map(v => `<option value="${v}">`).join('')}</datalist>
+                    `;
+
+                    const activeSub = Math.min(state.activeSubLevelForColor || 0, Math.max(0, bed.lithologies.length - 1));
+                    const quickColorSwatches = GEO_COLOR_PRESETS.map(c =>
+                        `<button type="button" title="${c.name}" onclick="applyQuickColorToActiveSub(${bed.id}, '${c.hex}')" class="w-4 h-4 rounded-full border border-gray-400 hover:scale-125 transition-transform shrink-0" style="background:${c.hex}"></button>`
+                    ).join('');
+
+                    const userColorSwatches = state.userQuickColors.map((hex, cIdx) => `
+                        <div class="relative group flex items-center">
+                            <button type="button" title="Aplicar color guardado al Sub-nivel ${activeSub + 1}" onclick="applyQuickColorToActiveSub(${bed.id}, '${hex}')" class="w-5 h-5 rounded border border-gray-500 hover:scale-110 transition-transform shadow-sm" style="background:${hex}"></button>
+                            <label title="Personalizar este color rápido" class="cursor-pointer ml-0.5 text-[9px] text-gray-400 hover:text-blue-600">
+                                ✎<input type="color" value="${hex}" onchange="updateUserQuickColor(${cIdx}, this.value)" class="sr-only"/>
+                            </label>
+                        </div>
+                    `).join('');
+
+                    const renderSubLithoCard = (slotIdx) => {
+                        const currentLithoId = bed.lithologies[slotIdx] || '';
+                        const currentColor = (bed.lithoColors && bed.lithoColors[slotIdx]) ? bed.lithoColors[slotIdx] : getBaseLithoColor(currentLithoId || 'mudstone');
+                        const currentGrain = (bed.lithoGrains && bed.lithoGrains[slotIdx]) ? bed.lithoGrains[slotIdx] : bed.grainSize;
+                        const currentSubStruct = (bed.lithoStructures && bed.lithoStructures[slotIdx]) ? bed.lithoStructures[slotIdx] : 'none';
+                        const isTargetSub = activeSub === slotIdx && currentLithoId;
+
+                        const catLithos = DEFAULT_LITHOLOGIES.filter(l => l.category === bed.category);
+                        const otherLithos = DEFAULT_LITHOLOGIES.filter(l => l.category !== bed.category);
+
+                        const lithoOptions = `
+                            ${slotIdx > 0 ? '<option value="">— Ninguna (No dividir) —</option>' : ''}
+                            <optgroup label="Categoría Principal (${ROCK_CATEGORIES.find(c => c.id === bed.category)?.label})">
+                                ${catLithos.map(l => `<option value="${l.id}" ${currentLithoId === l.id ? 'selected' : ''}>${l.label}</option>`).join('')}
+                            </optgroup>
+                            <optgroup label="Otras Litologías (Intercalación)">
+                                ${otherLithos.map(l => `<option value="${l.id}" ${currentLithoId === l.id ? 'selected' : ''}>${l.label}</option>`).join('')}
+                            </optgroup>
+                        `;
+
+                        const lithoObj = DEFAULT_LITHOLOGIES.find(l => l.id === currentLithoId);
+                        const scaleCategory = lithoObj ? (GRAIN_SCALES[lithoObj.category] ? lithoObj.category : 'fixed') : bed.category;
+                        const grainScaleList = getAllGrainOptionsForCategory(scaleCategory);
+
+                        const grainOptions = grainScaleList.map(g =>
+                            `<option value="${g.id}" ${currentGrain === g.id ? 'selected' : ''}>${g.label}</option>`
+                        ).join('');
+
+                        const subStructOptions = STRUCTURES.map(s =>
+                            `<option value="${s.id}" ${currentSubStruct === s.id ? 'selected' : ''}>${s.label}</option>`
+                        ).join('');
+
+                        const slotLabels = ['Sub-nivel 1 (Superior / Principal)', 'Sub-nivel 2 (Medio)', 'Sub-nivel 3 (Inferior)'];
+
+                        return `
+                            <div onclick="setActiveSubLevelForColor(${slotIdx})" class="p-2.5 rounded-lg border transition-all cursor-pointer ${currentLithoId ? (isTargetSub ? 'bg-blue-50/40 border-blue-400 ring-1 ring-blue-300 shadow-sm' : 'bg-white border-gray-300 shadow-sm') : 'bg-gray-100/70 border-dashed border-gray-300'}">
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <span class="text-[10px] font-bold uppercase tracking-wide ${isTargetSub ? 'text-blue-700' : (currentLithoId ? 'text-slate-700' : 'text-gray-400')}">
+                                        ${slotLabels[slotIdx]} ${isTargetSub ? '●' : ''}
+                                    </span>
+                                    ${currentLithoId ? `<button type="button" onclick="event.stopPropagation(); resetSubLithoColor(${bed.id}, ${slotIdx})" title="Restaurar color estándar de esta roca" class="text-[10px] text-blue-600 hover:underline flex items-center gap-0.5"><i data-lucide="rotate-ccw" class="w-2.5 h-2.5"></i> Default</button>` : ''}
+                                </div>
+                                
+                                <div class="flex items-center gap-1.5 mb-2" onclick="event.stopPropagation()">
+                                    <select onchange="updateSubLithology(${bed.id}, ${slotIdx}, this.value)" class="flex-1 p-1.5 border border-gray-300 rounded text-xs font-medium bg-white focus:ring-1 focus:ring-blue-500">
+                                        ${lithoOptions}
+                                    </select>
+                                    ${currentLithoId ? `
+                                        <div class="relative flex items-center" title="Cambiar color de este sub-nivel">
+                                            <input type="color" value="${currentColor}" oninput="updateSubLithoColor(${bed.id}, ${slotIdx}, this.value)" class="w-8 h-7 rounded cursor-pointer" />
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                ${currentLithoId ? `
+                                    <div class="grid grid-cols-2 gap-1.5 pt-1.5 border-t border-gray-100" onclick="event.stopPropagation()">
+                                        <div>
+                                            <label class="text-[9px] font-bold text-gray-400 block mb-0.5">GRANO / ESCALA</label>
+                                            <select onchange="updateSubLithoGrain(${bed.id}, ${slotIdx}, this.value)" class="w-full p-1 border border-gray-200 rounded text-[11px] bg-slate-50 font-semibold text-slate-700">
+                                                ${grainOptions}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] font-bold text-gray-400 block mb-0.5">ESTRUCTURA PRINCIPAL</label>
+                                            <select onchange="updateSubLithoStructure(${bed.id}, ${slotIdx}, this.value)" class="w-full p-1 border border-gray-200 rounded text-[11px] bg-slate-50 font-semibold text-slate-700">
+                                                ${subStructOptions}
+                                            </select>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    };
+
+                    const selS = (i) => `<select onchange="updateStructSecArray(${bed.id}, ${i}, this.value)" class="w-full p-1.5 border border-gray-300 rounded text-xs mb-1 bg-white focus:ring-1 focus:ring-blue-500"><option value="">(Ninguno)</option>${STRUCTURES.map(s => `<option value="${s.id}" ${bed.structuresSec[i] === s.id ? 'selected' : ''}>${s.label}</option>`).join('')}</select>`;
+
+                    html += `
+                        ${datalistsHTML}
+                        <div class="bg-white p-3.5 rounded-xl border border-gray-300 shadow-sm space-y-3.5">
+                            <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded text-xs font-bold">ESTRATO #${idx + 1}</span>
+                                    <button onclick="moveBed(${bed.id}, 1)" title="Subir estrato" class="p-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700"><i data-lucide="arrow-up" class="w-3.5 h-3.5"></i></button>
+                                    <button onclick="moveBed(${bed.id}, -1)" title="Bajar estrato" class="p-1 bg-gray-100 hover:bg-gray-200 rounded text-gray-700"><i data-lucide="arrow-down" class="w-3.5 h-3.5"></i></button>
+                                    <button onclick="duplicateBed(${bed.id})" title="Duplicar estrato" class="p-1 bg-gray-100 hover:bg-blue-100 rounded text-blue-700"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                </div>
+                                <button onclick="deleteBed(${bed.id})" title="Eliminar estrato" class="text-red-500 hover:bg-red-50 p-1 rounded transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+
+                            <!-- UNIDADES ESTRATIGRÁFICAS Y SUS COLORES -->
+                            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[10px] font-bold text-slate-600 uppercase">Unidades y Color</span>
+                                    <button onclick="applyStratToAll(${bed.id})" title="Copiar esta Edad, Grupo, Formación y sus colores a todos los estratos" class="text-[10px] text-blue-700 hover:bg-blue-100 px-2 py-0.5 rounded font-bold bg-blue-50 border border-blue-200 transition-colors">Aplicar a todo el perfil</button>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <div>
+                                        <label class="text-[9px] font-bold text-gray-500 block mb-0.5">EDAD</label>
+                                        <div class="flex gap-1">
+                                            <input type="text" list="dl-ages" value="${bed.age || ''}" oninput="updateBed(${bed.id},'age',this.value)" class="w-full p-1 border rounded text-xs bg-white"/>
+                                            <input type="color" value="${bed.ageColor || '#FFFFFF'}" oninput="updateStratColor(${bed.id}, 'age', 'ageColor', this.value)" title="Color Edad" class="w-6 h-6 shrink-0 rounded"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-bold text-gray-500 block mb-0.5">GRUPO</label>
+                                        <div class="flex gap-1">
+                                            <input type="text" list="dl-groups" value="${bed.group || ''}" oninput="updateBed(${bed.id},'group',this.value)" class="w-full p-1 border rounded text-xs bg-white"/>
+                                            <input type="color" value="${bed.groupColor || '#FFFFFF'}" oninput="updateStratColor(${bed.id}, 'group', 'groupColor', this.value)" title="Color Grupo" class="w-6 h-6 shrink-0 rounded"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-bold text-gray-500 block mb-0.5">FORMACIÓN</label>
+                                        <div class="flex gap-1">
+                                            <input type="text" list="dl-fms" value="${bed.formation || ''}" oninput="updateBed(${bed.id},'formation',this.value)" class="w-full p-1 border rounded text-xs bg-white"/>
+                                            <input type="color" value="${bed.formationColor || '#FFFFFF'}" oninput="updateStratColor(${bed.id}, 'formation', 'formationColor', this.value)" title="Color Formación" class="w-6 h-6 shrink-0 rounded"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ESPESOR, CONTACTO Y CATEGORÍA -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold uppercase block mb-0.5">Espesor (m)</label>
+                                    <input type="number" step="0.1" min="0.1" value="${bed.thickness}" oninput="updateBed(${bed.id},'thickness',this.value)" class="w-full p-1.5 border border-gray-300 rounded text-sm font-bold"/>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold uppercase block mb-0.5">Contacto Basal</label>
+                                    <select onchange="updateBed(${bed.id},'contact',this.value)" class="w-full p-1.5 border border-gray-300 rounded text-xs bg-white">${CONTACTS.map(c => `<option value="${c.id}" ${bed.contact === c.id ? 'selected' : ''}>${c.label}</option>`).join('')}</select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold uppercase block mb-0.5">Categoría Roca</label>
+                                    <select onchange="updateCategory(${bed.id}, this.value)" class="w-full p-1.5 border border-gray-300 rounded text-xs bg-white">${catOptions}</select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold uppercase block mb-0.5">Perfil / Gradación</label>
+                                    <select onchange="updateBed(${bed.id}, 'grading', this.value)" class="w-full p-1.5 border border-gray-300 rounded text-xs bg-white">${gradingOptions}</select>
+                                </div>
+                            </div>
+
+                            <!-- SUB-LITOLOGÍAS CON COLOR, GRANO Y ESTRUCTURA PROPIA -->
+                            <div class="space-y-2 pt-1 border-t border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[10px] text-slate-700 font-extrabold uppercase">Litologías, Color, Grano y Estructura</label>
+                                </div>
+                                <div class="bg-slate-50 p-2 rounded border border-gray-200 space-y-1.5">
+                                    <div class="flex items-center gap-1 flex-wrap">
+                                        <span class="text-[9px] font-bold text-gray-500 mr-1">ESTÁNDAR (Sub ${activeSub + 1}):</span>
+                                        ${quickColorSwatches}
+                                    </div>
+                                    <div class="flex items-center gap-1.5 flex-wrap pt-1 border-t border-gray-200">
+                                        <span class="text-[9px] font-bold text-blue-700 mr-0.5">MIS COLORES (✎):</span>
+                                        ${userColorSwatches}
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    ${renderSubLithoCard(0)}
+                                    ${renderSubLithoCard(1)}
+                                    ${renderSubLithoCard(2)}
+                                </div>
+                            </div>
+
+                            <!-- ESTRUCTURA GENERAL Y SÍMBOLOS LATERALES -->
+                            <div class="pt-1 border-t border-gray-200 space-y-2">
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold block mb-1 uppercase">Trama General (Opcional - todo el nivel)</label>
+                                    <select onchange="updateBed(${bed.id},'structureMain',this.value)" class="w-full p-1.5 border border-gray-300 rounded text-xs bg-white">
+                                        ${STRUCTURES.map(s => `<option value="${s.id}" ${bed.structureMain === s.id ? 'selected' : ''}>${s.label}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-500 font-bold block mb-1 uppercase">Símbolos Columna EST. (Máx 3)</label>
+                                    ${selS(0)}${selS(1)}${selS(2)}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-[10px] text-gray-500 font-bold block mb-1 uppercase">Descripción Litológica</label>
+                                <textarea oninput="updateBed(${bed.id},'description',this.value)" class="w-full p-2 border border-gray-300 rounded text-xs h-24 focus:ring-1 focus:ring-blue-500">${bed.description}</textarea>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `<div class="text-center text-gray-400 mt-16"><i data-lucide="mouse-pointer-click" class="mx-auto mb-2 opacity-40 w-10 h-10"></i><p class="text-xs font-bold uppercase tracking-wider">Haz clic sobre cualquier estrato<br>del perfil para editarlo</p></div>`;
+                }
+            } else if (state.activeTab === 'colors') {
+                const usedLithoPairs = [];
+                state.beds.forEach(b => {
+                    b.lithologies.forEach((lid, idx) => {
+                        const col = (b.lithoColors && b.lithoColors[idx]) ? b.lithoColors[idx] : getBaseLithoColor(lid);
+                        const key = `${lid}_${col}`;
+                        if (!usedLithoPairs.find(x => x.key === key)) {
+                            const lObj = DEFAULT_LITHOLOGIES.find(x => x.id === lid);
+                            if (lObj) {
+                                const displayLabel = (state.customLegendLabels && state.customLegendLabels[key]) ? state.customLegendLabels[key] : lObj.label;
+                                usedLithoPairs.push({ key, litho: lObj, color: col, label: displayLabel });
+                            }
+                        }
+                    });
+                });
+
+                const usedStructs = new Set(state.beds.flatMap(b => [b.structureMain, ...(b.lithoStructures || []), ...(b.structuresSec || [])]).filter(s => s && s !== 'none'));
+                const filteredStructs = STRUCTURES.filter(s => usedStructs.has(s.id));
+
+                const legendLithoInputs = usedLithoPairs.map(item => `
+                    <div class="flex items-center gap-2 bg-white p-1.5 rounded border border-gray-200">
+                        <span class="w-5 h-5 rounded border border-gray-400 shrink-0" style="background:${item.color}"></span>
+                        <input type="text" value="${item.label}" oninput="updateLegendLabel('${item.key}', this.value)" placeholder="${item.litho.label}" class="flex-1 text-xs font-semibold p-1 border rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                        ${state.customLegendLabels[item.key] ? `<button onclick="resetLegendLabel('${item.key}')" title="Restaurar nombre original" class="text-gray-400 hover:text-red-500 p-1"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>` : ''}
+                    </div>
+                `).join('');
+
+                const legendStructInputs = filteredStructs.map(s => {
+                    const key = `struct_${s.id}`;
+                    const val = (state.customLegendLabels && state.customLegendLabels[key]) ? state.customLegendLabels[key] : s.label;
+                    return `
+                        <div class="flex items-center gap-2 bg-white p-1.5 rounded border border-gray-200">
+                            <span class="text-[10px] font-bold text-gray-400 w-10 shrink-0">EST.</span>
+                            <input type="text" value="${val}" oninput="updateLegendLabel('${key}', this.value)" placeholder="${s.label}" class="flex-1 text-xs font-semibold p-1 border rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-blue-500"/>
+                            ${state.customLegendLabels[key] ? `<button onclick="resetLegendLabel('${key}')" title="Restaurar nombre original" class="text-gray-400 hover:text-red-500 p-1"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>` : ''}
+                        </div>
+                    `;
+                }).join('');
+
+                const lithoColorRows = DEFAULT_LITHOLOGIES.map(l => {
+                    const currentColor = getBaseLithoColor(l.id);
+                    return `
+                        <div class="flex items-center justify-between p-2 bg-white rounded border border-gray-200 shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded border border-gray-400 shrink-0" style="background:${currentColor}"></span>
+                                <div>
+                                    <div class="text-xs font-bold text-gray-800">${l.label}</div>
+                                    <div class="text-[10px] text-gray-400">${l.category}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <input type="color" value="${currentColor}" oninput="updateGlobalLithoColor('${l.id}', this.value)" class="w-7 h-7 rounded" />
+                                <button onclick="applyGlobalColorToAllBeds('${l.id}')" title="Aplicar este color a todas las capas existentes con esta roca" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold">Aplicar a todo</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                html = `
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg space-y-2">
+                            <div class="text-xs font-extrabold text-blue-900 uppercase flex items-center gap-1.5">
+                                <i data-lucide="tag" class="w-3.5 h-3.5"></i> Etiquetas de Referencias (Leyenda)
+                            </div>
+                            <p class="text-[11px] text-blue-800 leading-tight">Personaliza cómo se nombra cada litología/color y estructura en la hoja de Referencias (ej. <em>"Arenisca rojiza"</em>):</p>
+                            <div class="space-y-1.5 pt-1">
+                                ${legendLithoInputs || '<div class="text-xs text-gray-400 italic">No hay litologías cargadas</div>'}
+                                ${legendStructInputs}
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-xs text-amber-900">
+                            <strong>Paleta Litológica Global:</strong> Aquí puedes cambiar el color predeterminado de cada tipo de roca.
+                        </div>
+                        <div class="space-y-1.5">${lithoColorRows}</div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="space-y-3.5">
+                        <h3 class="font-bold text-gray-700 uppercase tracking-wider text-xs">Metadatos del Levantamiento</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="exportProjectJSON()" class="py-2 bg-slate-800 text-white text-xs font-bold rounded flex items-center justify-center gap-1.5 hover:bg-slate-700"><i data-lucide="download" class="w-3.5 h-3.5"></i> Guardar .JSON</button>
+                            <button onclick="document.getElementById('json-file-input').click()" class="py-2 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold rounded flex items-center justify-center gap-1.5 hover:bg-blue-100"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Cargar .JSON</button>
+                        </div>
+                        <div><label class="text-[10px] font-bold text-gray-500 uppercase">Afloramiento / Formación</label><input type="text" value="${state.projectInfo.formation}" oninput="updateProject('formation', this.value)" class="w-full p-2 border rounded text-sm bg-white"/></div>
+                        <div><label class="text-[10px] font-bold text-gray-500 uppercase">Ubicación / Cuenca</label><input type="text" value="${state.projectInfo.location}" oninput="updateProject('location', this.value)" class="w-full p-2 border rounded text-sm bg-white"/></div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div><label class="text-[10px] font-bold text-gray-500 uppercase">Fecha</label><input type="date" value="${state.projectInfo.date}" oninput="updateProject('date', this.value)" class="w-full p-2 border rounded text-xs bg-white"/></div>
+                            <div><label class="text-[10px] font-bold text-gray-500 uppercase">Escala (1:X)</label><input type="text" value="${state.projectInfo.scale}" oninput="updateProject('scale', this.value)" class="w-full p-2 border rounded text-sm bg-white"/></div>
+                        </div>
+                        <div><label class="text-[10px] font-bold text-gray-500 uppercase">Geólogo / Autor</label><input type="text" value="${state.projectInfo.geologist}" oninput="updateProject('geologist', this.value)" class="w-full p-2 border rounded text-sm bg-white"/></div>
+                        <div><label class="text-[10px] font-bold text-gray-500 uppercase">Observaciones / Interpretación</label><textarea oninput="updateProject('notes', this.value)" class="w-full p-2 border rounded text-xs bg-white h-24">${state.projectInfo.notes || ''}</textarea></div>
+                        
+                        <div class="pt-3 border-t border-gray-200 flex items-center justify-between">
+                            <span class="text-xs font-bold text-gray-600 uppercase">Escala Vertical (px/m)</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="changeZoom(-5)" class="p-1.5 bg-white border rounded shadow-sm hover:bg-gray-50"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
+                                <span class="text-sm font-mono font-bold w-10 text-center">${state.pixelsPerMeter}</span>
+                                <button onclick="changeZoom(5)" class="p-1.5 bg-white border rounded shadow-sm hover:bg-gray-50"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-200">
+                            <button onclick="resetProject()" class="w-full py-2 bg-red-50 text-red-600 text-xs font-bold rounded border border-red-200 hover:bg-red-100 transition-all">Reiniciar Perfil de Fábrica</button>
+                        </div>
+                    </div>
+                `;
+            }
+            content.innerHTML = html;
+
+            ['layers', 'colors', 'project'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (!el) return;
+                if (state.activeTab === t) {
+                    el.classList.add('border-blue-600', 'text-blue-600', 'bg-white');
+                    el.classList.remove('border-transparent', 'text-gray-500');
+                } else {
+                    el.classList.remove('border-blue-600', 'text-blue-600', 'bg-white');
+                    el.classList.add('border-transparent', 'text-gray-500');
+                }
+            });
+
+            const btnProf = document.getElementById('btn-view-profile');
+            const btnLeg = document.getElementById('btn-view-legend');
+            if (state.viewMode === 'profile') {
+                btnProf.className = 'px-2.5 py-1 text-xs font-bold rounded flex gap-1 items-center bg-amber-500 text-slate-950 transition-all';
+                btnLeg.className = 'px-2.5 py-1 text-xs font-bold rounded flex gap-1 items-center text-gray-400 hover:text-white transition-all';
+            } else {
+                btnLeg.className = 'px-2.5 py-1 text-xs font-bold rounded flex gap-1 items-center bg-amber-500 text-slate-950 transition-all';
+                btnProf.className = 'px-2.5 py-1 text-xs font-bold rounded flex gap-1 items-center text-gray-400 hover:text-white transition-all';
+            }
+        }
+
+        // --- HANDLERS DE INTERACCIÓN ---
+        function setActiveTab(t) { state.activeTab = t; renderApp(); }
+        function setViewMode(m) { state.viewMode = m; renderApp(); }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('translate-x-full'); }
+        function selectBed(id) { state.selectedBedId = id; state.activeTab = 'layers'; state.activeSubLevelForColor = 0; renderApp(); }
+        function updateProject(f, v) { state.projectInfo[f] = v; pushHistory(); saveLocal(); renderSVG(); }
+        function changeZoom(d) { state.pixelsPerMeter = Math.max(15, Math.min(120, state.pixelsPerMeter + d)); saveLocal(); renderApp(); }
+
+        function setActiveSubLevelForColor(idx) {
+            state.activeSubLevelForColor = idx;
+            renderSidebar();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function updateUserQuickColor(cIdx, hex) {
+            state.userQuickColors[cIdx] = hex;
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function applyQuickColorToActiveSub(bedId, hex) {
+            const b = state.beds.find(x => x.id === bedId);
+            if (!b) return;
+            const targetIdx = Math.min(state.activeSubLevelForColor || 0, b.lithologies.length - 1);
+            updateSubLithoColor(bedId, targetIdx, hex);
+            renderSidebar();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function addBed() {
+            const lastBed = state.beds[state.beds.length - 1];
+            const newBed = {
+                id: Date.now(),
+                thickness: 2.5,
+                category: 'clastic',
+                grainSize: 'f_sand',
+                grading: 'uniform',
+                lithologies: ['sandstone'],
+                lithoColors: [getBaseLithoColor('sandstone')],
+                lithoGrains: ['f_sand'],
+                lithoStructures: ['none'],
+                structureMain: 'none',
+                structuresSec: [],
+                contact: 'sharp',
+                description: 'Descripción del nuevo nivel...',
+                age: lastBed ? lastBed.age : '',
+                ageColor: lastBed ? lastBed.ageColor : '#FFFFFF',
+                group: lastBed ? lastBed.group : '',
+                groupColor: lastBed ? lastBed.groupColor : '#FFFFFF',
+                formation: lastBed ? lastBed.formation : '',
+                formationColor: lastBed ? lastBed.formationColor : '#FFFFFF'
+            };
+            state.beds.push(newBed);
+            state.selectedBedId = newBed.id;
+            state.activeTab = 'layers';
+            state.activeSubLevelForColor = 0;
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function duplicateBed(id) {
+            const idx = state.beds.findIndex(x => x.id === id);
+            if (idx === -1) return;
+            const copy = JSON.parse(JSON.stringify(state.beds[idx]));
+            copy.id = Date.now();
+            state.beds.splice(idx + 1, 0, copy);
+            state.selectedBedId = copy.id;
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function moveBed(id, dir) {
+            const idx = state.beds.findIndex(x => x.id === id);
+            const target = idx + dir;
+            if (idx === -1 || target < 0 || target >= state.beds.length) return;
+            const temp = state.beds[idx];
+            state.beds[idx] = state.beds[target];
+            state.beds[target] = temp;
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function updateBed(id, f, v) {
+            const b = state.beds.find(x => x.id === id);
+            if (b) {
+                b[f] = v;
+                pushHistory();
+                saveLocal();
+                renderSVG();
+                if (['grainSize', 'contact', 'structureMain', 'category', 'grading'].includes(f)) renderSidebar();
+            }
+        }
+
+        function updateStratColor(id, textField, colorField, hex) {
+            const b = state.beds.find(x => x.id === id);
+            if (!b) return;
+            const targetText = b[textField];
+            b[colorField] = hex;
+            if (targetText) {
+                state.beds.forEach(other => {
+                    if (other[textField] === targetText) other[colorField] = hex;
+                });
+            }
+            pushHistory();
+            saveLocal();
+            renderSVG();
+        }
+
+        function applyStratToAll(id) {
+            const b = state.beds.find(x => x.id === id);
+            if (!b) return;
+            state.beds.forEach(other => {
+                other.age = b.age;
+                other.ageColor = b.ageColor;
+                other.group = b.group;
+                other.groupColor = b.groupColor;
+                other.formation = b.formation;
+                other.formationColor = b.formationColor;
+            });
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function updateSubLithology(bedId, slotIdx, newLithoId) {
+            const b = state.beds.find(x => x.id === bedId);
+            if (!b) return;
+            if (!newLithoId) {
+                b.lithologies.splice(slotIdx, 1);
+                b.lithoColors.splice(slotIdx, 1);
+                b.lithoGrains.splice(slotIdx, 1);
+                b.lithoStructures.splice(slotIdx, 1);
+                if (b.lithologies.length === 0) {
+                    b.lithologies = ['mudstone'];
+                    b.lithoColors = [getBaseLithoColor('mudstone')];
+                    b.lithoGrains = ['clay'];
+                    b.lithoStructures = ['none'];
+                }
+            } else {
+                const lObj = DEFAULT_LITHOLOGIES.find(l => l.id === newLithoId);
+                b.lithologies[slotIdx] = newLithoId;
+                b.lithoColors[slotIdx] = getBaseLithoColor(newLithoId);
+                b.lithoGrains[slotIdx] = lObj?.defaultGrain || b.grainSize || 'f_sand';
+                if (!b.lithoStructures[slotIdx]) b.lithoStructures[slotIdx] = 'none';
+                const cleanLithos = [], cleanColors = [], cleanGrains = [], cleanStructs = [];
+                for (let i = 0; i < b.lithologies.length; i++) {
+                    if (b.lithologies[i]) {
+                        cleanLithos.push(b.lithologies[i]);
+                        cleanColors.push(b.lithoColors[i] || getBaseLithoColor(b.lithologies[i]));
+                        cleanGrains.push(b.lithoGrains[i] || 'f_sand');
+                        cleanStructs.push(b.lithoStructures[i] || 'none');
+                    }
+                }
+                b.lithologies = cleanLithos;
+                b.lithoColors = cleanColors;
+                b.lithoGrains = cleanGrains;
+                b.lithoStructures = cleanStructs;
+            }
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function updateSubLithoColor(bedId, slotIdx, hex) {
+            const b = state.beds.find(x => x.id === bedId);
+            if (!b) return;
+            b.lithoColors[slotIdx] = hex;
+            pushHistory();
+            saveLocal();
+            renderSVG();
+        }
+
+        function resetSubLithoColor(bedId, slotIdx) {
+            const b = state.beds.find(x => x.id === bedId);
+            if (!b || !b.lithologies[slotIdx]) return;
+            b.lithoColors[slotIdx] = getBaseLithoColor(b.lithologies[slotIdx]);
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function updateSubLithoGrain(bedId, slotIdx, newGrainId) {
+            const b = state.beds.find(x => x.id === bedId);
+            if (!b) return;
+            b.lithoGrains[slotIdx] = newGrainId;
+            if (slotIdx === 0) b.grainSize = newGrainId;
+            pushHistory();
+            saveLocal();
+            renderSVG();
+        }
+
+        function updateSubLithoStructure(bedId, slotIdx, newStructId) {
+            const b = state.beds.find(x => x.id === bedId);
+            if (!b) return;
+            b.lithoStructures[slotIdx] = newStructId;
+            pushHistory();
+            saveLocal();
+            renderSVG();
+        }
+
+        function updateGlobalLithoColor(lithoId, hex) {
+            if (!state.customLithoColors) state.customLithoColors = {};
+            state.customLithoColors[lithoId] = hex;
+            saveLocal();
+            renderSVG();
+        }
+
+        function updateLegendLabel(key, newVal) {
+            if (!state.customLegendLabels) state.customLegendLabels = {};
+            state.customLegendLabels[key] = newVal;
+            saveLocal();
+            renderSVG();
+        }
+
+        function resetLegendLabel(key) {
+            if (state.customLegendLabels) {
+                delete state.customLegendLabels[key];
+                saveLocal();
+                renderApp();
+            }
+        }
+
+        function editLegendLabel(key, currentLabel) {
+            state.activeTab = 'colors';
+            renderSidebar();
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function applyGlobalColorToAllBeds(lithoId) {
+            const col = getBaseLithoColor(lithoId);
+            state.beds.forEach(b => {
+                b.lithologies.forEach((lid, idx) => {
+                    if (lid === lithoId) b.lithoColors[idx] = col;
+                });
+            });
+            pushHistory();
+            saveLocal();
+            renderApp();
+        }
+
+        function updateStructSecArray(id, idx, val) {
+            const b = state.beds.find(x => x.id === id);
+            if (b) {
+                if (!b.structuresSec) b.structuresSec = [];
+                if (val) b.structuresSec[idx] = val; else b.structuresSec.splice(idx, 1);
+                b.structuresSec = b.structuresSec.filter(Boolean);
+                pushHistory();
+                saveLocal();
+                renderApp();
+            }
+        }
+
+        function deleteBed(id) {
+            if (state.beds.length > 1) {
+                state.beds = state.beds.filter(b => b.id !== id);
+                state.selectedBedId = state.beds[state.beds.length - 1].id;
+                pushHistory();
+                saveLocal();
+                renderApp();
+            }
+        }
+
+        function updateCategory(bedId, newCategory) {
+            const b = state.beds.find(x => x.id === bedId);
+            if (b) {
+                b.category = newCategory;
+                const defaultLitho = DEFAULT_LITHOLOGIES.find(l => l.category === newCategory) || DEFAULT_LITHOLOGIES[0];
+                b.grainSize = defaultLitho.defaultGrain;
+                b.lithologies = [defaultLitho.id];
+                b.lithoColors = [getBaseLithoColor(defaultLitho.id)];
+                b.lithoGrains = [defaultLitho.defaultGrain];
+                b.lithoStructures = ['none'];
+                pushHistory();
+                saveLocal();
+                renderApp();
+            }
+        }
+
+        function getCleanSVGString() {
+            const origSvg = document.querySelector('#svg-container svg');
+            const clone = origSvg.cloneNode(true);
+            clone.querySelectorAll('.selection-ui').forEach(el => el.remove());
+            return new XMLSerializer().serializeToString(clone);
+        }
+
+        function exportToPNG() {
+            const s = document.querySelector('#svg-container svg');
+            const d = getCleanSVGString();
+            const b = new Blob([d], { type: "image/svg+xml;charset=utf-8" });
+            const u = URL.createObjectURL(b);
+            const i = new Image();
+            i.onload = () => {
+                const c = document.getElementById('export-canvas');
+                const h = parseInt(s.getAttribute('height'));
+                const scale = 2;
+                c.width = 900 * scale;
+                c.height = h * scale;
+                const x = c.getContext('2d');
+                x.scale(scale, scale);
+                x.fillStyle = "white";
+                x.fillRect(0, 0, 900, h);
+                x.drawImage(i, 0, 0);
+                const p = c.toDataURL("image/png");
+                const l = document.createElement("a");
+                l.href = p;
+                l.download = `${state.viewMode === 'profile' ? 'perfil_estratigrafico' : 'referencias'}.png`;
+                l.click();
+                URL.revokeObjectURL(u);
+            };
+            i.src = u;
+        }
+
+        function exportToSVG() {
+            const d = getCleanSVGString();
+            const b = new Blob([d], { type: "image/svg+xml;charset=utf-8" });
+            const u = URL.createObjectURL(b);
+            const l = document.createElement("a");
+            l.href = u;
+            l.download = `${state.viewMode === 'profile' ? 'perfil_estratigrafico' : 'referencias'}.svg`;
+            l.click();
+            URL.revokeObjectURL(u);
+        }
+
+        function exportProjectJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const a = document.createElement('a');
+            a.setAttribute("href", dataStr);
+            a.setAttribute("download", `proyecto_${(state.projectInfo.formation || 'litholog').replace(/\s+/g, '_')}.json`);
+            a.click();
+        }
+
+        function importProjectJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && Array.isArray(imported.beds)) {
+                        state = { ...defaultState, ...imported };
+                        normalizeStateBeds();
+                        pushHistory();
+                        saveLocal();
+                        renderApp();
+                    }
+                } catch (err) {
+                    console.error("Archivo JSON inválido", err);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        window.onload = () => { loadLocal(); renderApp(); };
+    </script>
+</body>
+</html>
